@@ -3,11 +3,14 @@
 Photography for every product surface on the site — product cards, product /
 model detail pages, the certified pre-owned listing and the solutions page.
 
-The current files were downloaded from AIC's catalogue (aicipc.com) — source
-pages are listed in `src/data/productImages.js`, which also controls gallery
-order and labels. Families with no photos (`neptune`, `mars`, `pluto`) show a
-reserved "Product photography to follow" panel on detail pages and a faint
-no-photo mark on cards until files are added here.
+Most files were downloaded from AIC's catalogue (aicipc.com); `neptune`,
+`mars` and `pluto` have no AIC equivalent, so their shots come from Supermicro
+(SYS-751A-I tower), ASRock Industrial (NUCS BOX-155H mini PC) and Advantech
+(UNO-2271G V2 edge gateway) respectively. Source pages are listed in
+`src/data/productImages.js`, which also controls gallery order and labels.
+A family with no photos shows a reserved "Product photography to follow"
+panel on detail pages and a faint no-photo mark on cards until files are
+added here.
 
 ## Where files go
 

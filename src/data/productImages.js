@@ -13,7 +13,16 @@
  *   io      — AIC J4024-05-04X https://www.aicipc.com/products-detail/j4024-05-04x/
  *   saturn  — AIC HA202-PV     https://www.aicipc.com/products-detail/ha202-pv/
  * neptune / mars / pluto have no AIC equivalent (AIC sells no towers, mini
- * desktops or fanless boxes) — their space stays reserved.
+ * desktops or fanless boxes), so their shots come from other manufacturers
+ * (downloaded 2026-07-23):
+ *   neptune — Supermicro SYS-751A-I tower workstation
+ *             https://www.wiredzone.com/shop/product/10026872 (front-45)
+ *             https://www.rackmountpro.com/product/4327/SYS-751A-I.html (front)
+ *   mars    — ASRock Industrial NUCS BOX-155H mini PC
+ *             https://mitxpc.com/products/nucs-box-155h
+ *   pluto   — Advantech UNO-2271G V2 edge IoT gateway
+ *             https://www.advantech.com/en-us/products/1-2mlj9a/uno-2271g-v2/mod_a7b043d4-20e9-4276-ad94-2492f00e110e
+ *             https://www.anewtech.net/products/embedded-computer/embedded-system-edge-computer/uno-series/ad-uno-2271g-v2
  *
  * The chassis families (server-chassis / industrial-pc / es1-chassis) reuse
  * per-model shots from `src/data/chassis.js` — the gallery shows a
@@ -43,6 +52,21 @@ export const productImages = {
     { label: 'Front 45°', src: '/products/saturn/front-45.jpg' },
     { label: 'Rear', src: '/products/saturn/rear.jpg' },
     { label: 'Top open', src: '/products/saturn/top.jpg' },
+  ],
+  neptune: [
+    { label: 'Front 45°', src: '/products/neptune/front-45.jpg' },
+    { label: 'Front', src: '/products/neptune/front.jpg' },
+  ],
+  mars: [
+    { label: 'Front 45°', src: '/products/mars/front-45.jpg' },
+    { label: 'Front', src: '/products/mars/front.jpg' },
+    { label: 'Rear', src: '/products/mars/rear.jpg' },
+    { label: 'Rear 45°', src: '/products/mars/rear-45.jpg' },
+  ],
+  pluto: [
+    { label: 'Front 45°', src: '/products/pluto/front-45.png' },
+    { label: 'Front', src: '/products/pluto/front.jpg' },
+    { label: 'Stacked expansion', src: '/products/pluto/stack.jpg' },
   ],
   'server-chassis': [
     { label: 'RSC-4BT — 4U 36-bay', src: '/products/server-chassis/rsc-4bt.jpg' },
