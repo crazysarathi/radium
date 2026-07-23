@@ -18,9 +18,6 @@ const SORTS = [
 function StockCard({ item }) {
   const product = getProduct(item.family)
   const grade = getGrade(item.grade)
-  const model = item.modelCode
-    ? { code: item.modelCode, bays: parseInt(item.modelCode.slice(0, 2), 10), drivesInstalled: parseInt(item.modelCode.slice(4, 6), 10) }
-    : undefined
 
   return (
     <Link to={`/certified-pre-owned/${item.id}`} className="reveal glass glass-hover group flex flex-col overflow-hidden">
@@ -32,7 +29,7 @@ function StockCard({ item }) {
           {grade.key}
         </span>
         <div className="transition-transform duration-500 group-hover:scale-[1.04]">
-          <ProductImage product={product} model={model} className="aspect-[360/236] w-full" />
+          <ProductImage product={product} className="aspect-[360/236] w-full" />
         </div>
       </div>
 

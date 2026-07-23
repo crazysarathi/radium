@@ -1,95 +1,51 @@
 /**
- * Product media — manufacturer catalogue photography only.
+ * Product media — catalogue photography served locally from `public/products/`.
  *
- * Two photo sources, tried in order:
- *   1. Catalogue shots declared per family in `src/data/productImages.js`
- *      (downloaded from AIC into `public/products/<slug>/`).
- *   2. Extra local photography dropped into `public/products/<slug>/<view>.<ext>`
- *      without a data entry — auto-discovered, deduped against the declared set.
- * A family with no photos shows a reserved empty panel — fill it by adding a
- * file + data entry. No generated artwork.
+ * Every family's shots are declared in `src/data/productImages.js`; the first
+ * entry is the card/cover shot. A family with no entry shows a reserved empty
+ * panel until photography is added — no probing, no generated artwork.
  *
- *   ProductImage   — single image (cards, listings, solutions)
+ *   ProductImage   — cover shot (cards, listings, hero, compare)
  *   ProductGallery — AIC-style viewer: vertical thumbnail rail + arrows,
  *                    click-to-open fullscreen lightbox with side navigation
  */
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { ChevronUp, ChevronDown, ChevronLeft, ChevronRight, ImageOff, Maximize2, X } from 'lucide-react'
 import { imagesFor } from '@/data/productImages'
 import { cn } from '@/lib/utils'
 
-/** Standard angles, mirrored to AIC's front / front-45 / rear / top set. */
-const VIEWS = [
-  { id: 'front-45', label: 'Front 45°' },
-  { id: 'front', label: 'Front' },
-  { id: 'rear', label: 'Rear' },
-  { id: 'top', label: 'Top open' },
-]
-const EXTS = ['jpg', 'png', 'webp']
-
-/** Candidate file paths for a view, most-specific first (per-SKU, then family). */
-function candidates(product, model, viewId) {
-  const bases = []
-  if (product && model) bases.push(`/products/${product.slug}/${model.code}`)
-  if (product) bases.push(`/products/${product.slug}`)
-  return bases.flatMap((b) => EXTS.map((e) => `${b}/${viewId}.${e}`))
-}
-
 /* ------------------------------------------------------------------ */
 /* Single image — cards, listings, solutions                           */
 /* ------------------------------------------------------------------ */
 
-export function ProductImage({ product, model, viewId = 'cover', className }) {
-  const cands = useMemo(() => {
-    // Declared catalogue shots first, then local files for the requested view.
-    const declared = imagesFor(product).map((r) => r.src)
-    const ids = viewId === 'cover' ? ['cover', 'front-45'] : [viewId]
-    return [...new Set([...declared.slice(0, 1), ...ids.flatMap((id) => candidates(product, model, id)), ...declared.slice(1)])]
-  }, [product?.slug, model?.code, viewId]) // eslint-disable-line react-hooks/exhaustive-deps
-  const [i, setI] = useState(0)
-  const [loaded, setLoaded] = useState(false)
+export function ProductImage({ product, className }) {
+  const src = imagesFor(product)[0]?.src
+  const [failed, setFailed] = useState(false)
 
-  // Reset when the product or requested view changes so a new candidate list
-  // doesn't inherit a failed index.
-  useEffect(() => {
-    setI(0)
-    setLoaded(false)
-  }, [product?.slug, model?.code, viewId]) // eslint-disable-line react-hooks/exhaustive-deps
+  // A failed load is retried whenever the source changes — one transient
+  // network error on a first visit must never hide the photo for the session.
+  useEffect(() => setFailed(false), [src])
 
-  const src = i < cands.length ? cands[i] : null
-  const showPhoto = Boolean(src) && loaded
+  if (!src || failed) {
+    return (
+      <div className={cn('flex items-center justify-center overflow-hidden bg-white/[.02]', className)}>
+        <ImageOff aria-hidden className="h-1/4 max-h-6 w-auto text-white/15" />
+      </div>
+    )
+  }
 
-  // White studio panel once a photo loads; until then the space is reserved —
-  // a faint camera-off mark, no stand-in artwork.
+  // White studio panel; the photo paints progressively as it streams in.
   return (
-    <div
-      className={cn(
-        'relative flex items-center justify-center overflow-hidden',
-        showPhoto ? 'bg-white' : 'bg-white/[.02]',
-        className
-      )}
-    >
-      {!showPhoto && <ImageOff aria-hidden className="h-1/4 max-h-6 w-auto text-white/15" />}
-      {src && (
-        <img
-          src={src}
-          alt={product?.name ?? 'Radium hardware'}
-          loading="lazy"
-          referrerPolicy="no-referrer"
-          onLoad={() => setLoaded(true)}
-          onError={() => {
-            setLoaded(false)
-            setI((n) => n + 1)
-          }}
-          // opacity, not display:none — a lazy image with no layout box is
-          // never fetched by the browser, so onLoad would never fire.
-          className={cn(
-            'absolute inset-0 block h-full w-full object-contain p-[5%] transition-opacity',
-            showPhoto ? 'opacity-100' : 'opacity-0'
-          )}
-        />
-      )}
+    <div className={cn('overflow-hidden bg-white', className)}>
+      <img
+        src={src}
+        alt={product?.name ?? 'Radium hardware'}
+        loading="lazy"
+        decoding="async"
+        onError={() => setFailed(true)}
+        className="block h-full w-full object-contain p-[5%]"
+      />
     </div>
   )
 }
@@ -186,7 +142,6 @@ function Lightbox({ slides, index, title, onClose, onStep }) {
           <img
             src={s.src}
             alt={`${title} — ${s.label}`}
-            referrerPolicy="no-referrer"
             onClick={(e) => e.stopPropagation()}
             className="max-h-[82vh] w-auto max-w-full rounded-lg bg-white object-contain p-4"
           />
@@ -239,7 +194,7 @@ function Lightbox({ slides, index, title, onClose, onStep }) {
                 i === index ? 'border-beam/70 opacity-100' : 'border-transparent opacity-50 hover:opacity-90'
               )}
             >
-              <img src={t.src} alt="" referrerPolicy="no-referrer" className="h-full w-full object-contain" />
+              <img src={t.src} alt="" className="h-full w-full object-contain" />
             </button>
           ))}
         </div>
@@ -253,82 +208,24 @@ function Lightbox({ slides, index, title, onClose, onStep }) {
 /* Multi-angle gallery — product detail pages                          */
 /* ------------------------------------------------------------------ */
 
-/** Preload each local view and resolve the first working source (or drop it). */
-function useResolvedPhotos(product, model) {
-  const key = `${product?.slug ?? ''}|${model?.code ?? ''}`
-  const [photos, setPhotos] = useState([])
-
-  useEffect(() => {
-    if (!product) {
-      setPhotos([])
-      return undefined
-    }
-    let alive = true
-    const results = new Array(VIEWS.length).fill(undefined)
-    let done = 0
-    const finish = (idx, val) => {
-      results[idx] = val
-      done += 1
-      if (done === VIEWS.length && alive) setPhotos(results.filter(Boolean))
-    }
-    VIEWS.forEach((v, idx) => {
-      const cands = candidates(product, model, v.id)
-      const tryOne = (ci) => {
-        if (ci >= cands.length) return finish(idx, null)
-        const img = new Image()
-        img.onload = () => finish(idx, { ...v, src: cands[ci] })
-        img.onerror = () => tryOne(ci + 1)
-        img.src = cands[ci]
-        return undefined
-      }
-      tryOne(0)
-    })
-    setPhotos([])
-    return () => {
-      alive = false
-    }
-  }, [key]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  return photos
-}
-
-export default function ProductGallery({ product, model, className, caption }) {
-  const localPhotos = useResolvedPhotos(product, model)
+export default function ProductGallery({ product, className, caption }) {
+  const slides = imagesFor(product)
   const [active, setActive] = useState(0)
   const [open, setOpen] = useState(false)
-  // Remote URLs that failed to load this session — dropped from the slide list.
-  const [dead, setDead] = useState(() => new Set())
 
   useEffect(() => {
     setActive(0)
     setOpen(false)
-    setDead(new Set())
-  }, [product?.slug, model?.code]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [product?.slug])
 
-  const declared = imagesFor(product)
-  const remote = declared.filter((r) => !dead.has(r.src))
-
-  // Declared catalogue shots first, then any extra undeclared local
-  // photography — deduped so a probed file never repeats a declared one.
-  const declaredSrcs = new Set(declared.map((r) => r.src))
-  const extras = localPhotos.filter((p) => !declaredSrcs.has(p.src))
-  const slides = [...remote.map((p) => ({ ...p })), ...extras.map((p) => ({ ...p }))]
   const idx = Math.min(active, Math.max(slides.length - 1, 0))
   const current = slides[idx]
   const hasRail = slides.length > 1
   const title = product?.name ?? 'Radium hardware'
 
-  // Navigate from the clamped display index, never the raw state — after a
-  // dead slide is dropped, raw `active` can sit past the end of `slides`.
   const step = (dir) => setActive(Math.min(Math.max(idx + dir, 0), slides.length - 1))
   // Lightbox navigation wraps so the side arrows always lead somewhere.
   const stepWrap = (dir) => setActive((idx + dir + slides.length) % slides.length)
-  const dropDead = (src) =>
-    setDead((prev) => {
-      const next = new Set(prev)
-      next.add(src)
-      return next
-    })
 
   /* No photography yet — hold the space open, to be filled later. */
   if (!current) {
@@ -363,14 +260,7 @@ export default function ProductGallery({ product, model, className, caption }) {
                     i === idx ? 'border-beam/60' : 'border-white/10 opacity-80 hover:border-beam/40 hover:opacity-100'
                   )}
                 >
-                  <img
-                    src={s.src}
-                    alt={s.label}
-                    loading="lazy"
-                    referrerPolicy="no-referrer"
-                    onError={() => s.remote && dropDead(s.src)}
-                    className="h-full w-full object-contain"
-                  />
+                  <img src={s.src} alt={s.label} loading="lazy" decoding="async" className="h-full w-full object-contain" />
                 </button>
               ))}
             </div>
@@ -409,8 +299,7 @@ export default function ProductGallery({ product, model, className, caption }) {
           <img
             src={current.src}
             alt={`${title} — ${current.label}`}
-            referrerPolicy="no-referrer"
-            onError={() => current.remote && dropDead(current.src)}
+            decoding="async"
             className="block max-h-[440px] w-full object-contain p-6"
           />
           <span className="absolute bottom-3 right-3 flex h-8 w-8 items-center justify-center rounded-lg bg-black/50 text-white opacity-0 backdrop-blur transition-opacity group-hover:opacity-100">

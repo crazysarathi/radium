@@ -14,9 +14,6 @@ export default function RefurbDetail() {
 
   const grade = getGrade(item.grade)
   const product = getProduct(item.family)
-  const model = item.modelCode
-    ? { code: item.modelCode, bays: parseInt(item.modelCode.slice(0, 2), 10), drivesInstalled: parseInt(item.modelCode.slice(4, 6), 10) }
-    : undefined
 
   const alsoAvailable = refurbished.filter((r) => r.id !== item.id).slice(0, 4)
 
@@ -102,7 +99,6 @@ export default function RefurbDetail() {
             <ProductGallery
               key={item.id}
               product={product}
-              model={model}
               caption="Representative catalogue photography for the listed configuration. Photographs of the exact unit are supplied with the quotation."
             />
           </div>

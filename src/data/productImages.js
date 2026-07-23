@@ -90,8 +90,4 @@ export const productImages = {
 
 /** Declared gallery images for a product, in display order. Safe on null. */
 export const imagesFor = (product) =>
-  (productImages[product?.slug] ?? []).map((img, i) => ({
-    id: `cat-${i}`,
-    remote: true, // still guarded by the gallery's dead-source fallback
-    ...img,
-  }))
+  (productImages[product?.slug] ?? []).map((img, i) => ({ id: `cat-${i}`, ...img }))

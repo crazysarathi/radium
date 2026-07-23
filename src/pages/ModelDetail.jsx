@@ -79,7 +79,6 @@ export default function ModelDetail() {
             <ProductGallery
               key={model.code}
               product={family}
-              model={model}
               caption={`Catalogue photography of the ${family.name} platform. This model ships as a ${model.bays}-bay chassis with ${model.drivesInstalled} drives installed — see the breakdown alongside.`}
             />
           </div>
