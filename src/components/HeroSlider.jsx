@@ -87,9 +87,8 @@ const pad = (n) => String(n + 1).padStart(2, '0')
 export default function HeroSlider() {
   const reduce = useReducedMotion()
   const [active, setActive] = useState(0)
-  const [paused, setPaused] = useState(false)
-  // Bumped on every manual jump / hover-resume so the autoplay timer and the
-  // progress bar restart together instead of drifting apart.
+  // Bumped on every manual jump so the autoplay timer and the progress bar
+  // restart together instead of drifting apart.
   const [cycle, setCycle] = useState(0)
 
   const slide = SLIDES[active]
@@ -102,10 +101,10 @@ export default function HeroSlider() {
   }
 
   useEffect(() => {
-    if (paused || reduce) return undefined
+    if (reduce) return undefined
     const timer = setTimeout(() => setActive((a) => (a + 1) % SLIDES.length), AUTOPLAY_MS)
     return () => clearTimeout(timer)
-  }, [active, paused, cycle, reduce])
+  }, [active, cycle, reduce])
 
   // Warm the cache for every slide's cover shot so the first rotation never
   // shows an empty panel while an image streams in.
@@ -140,11 +139,6 @@ export default function HeroSlider() {
       aria-roledescription="carousel"
       aria-label="Radium highlights"
       className="relative flex min-h-[92svh] flex-col overflow-hidden pb-10 pt-28 md:pt-32 lg:min-h-[100svh]"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => {
-        setPaused(false)
-        setCycle((c) => c + 1)
-      }}
       onKeyDown={(e) => {
         if (e.key === 'ArrowLeft') go(active - 1)
         if (e.key === 'ArrowRight') go(active + 1)
@@ -351,7 +345,6 @@ export default function HeroSlider() {
                         background: `rgb(${st.accent})`,
                         transform: reduce ? 'scaleX(1)' : undefined,
                         animation: reduce ? 'none' : `hero-progress ${AUTOPLAY_MS}ms linear forwards`,
-                        animationPlayState: paused ? 'paused' : 'running',
                       }}
                     />
                   )}
