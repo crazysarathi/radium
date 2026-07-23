@@ -87,9 +87,7 @@ export default function Footer() {
           <div className="flex flex-wrap items-center gap-5">
             <Link to="/company" className="hover:text-foreground">Privacy</Link>
             <Link to="/company" className="hover:text-foreground">Terms</Link>
-            <a href="#top" className="inline-flex items-center gap-1 hover:text-beam">
-              Back to top <ArrowUpRight className="h-3.5 w-3.5" />
-            </a>
+            
           </div>
         </div>
       </div>
