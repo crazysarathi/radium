@@ -7,7 +7,7 @@ import { getProduct } from '@/data/products'
 import { imagesFor } from '@/data/productImages'
 import { THEMES, useThemeZone } from '@/components/ThemeField'
 
-const AUTOPLAY_MS = 3000
+const AUTOPLAY_MS = 4000
 
 /**
  * AIC-style hero carousel: full-screen slides, each with its own colour mood
@@ -25,7 +25,7 @@ const SLIDES = [
       'Compute, SAN/NAS storage, expansion pods, reading workstations and IoMT gateways — one hardware line engineered end to end for PACS, VNA and enterprise medical imaging.',
     ctas: [
       { label: 'Explore the product line', to: '/products' },
-      { label: 'Certified Pre-Owned', to: '/certified-pre-owned', outline: true },
+      { label: 'Request a quote', to: '/contact', outline: true },
     ],
     product: 'jupiter',
     caption: 'Jupiter SS 242016 — 24-bay storage server',
@@ -47,22 +47,6 @@ const SLIDES = [
     caption: 'Io JB — 24-bay expansion pod',
     status: 'Shipping now',
     chips: ['Model number = spec sheet', 'Bay-level scaling', 'One firmware baseline'],
-  },
-  {
-    key: 'cpo',
-    theme: 'crimson',
-    eyebrow: 'Certified Pre-Owned',
-    title: 'Used hardware, held to the new-hardware standard.',
-    body:
-      'Six-stage refurbishment: certified data destruction, teardown, new consumables, a current firmware baseline, a 72-hour burn-in, and a warranty with the same escalation path as new.',
-    ctas: [
-      { label: 'Browse available stock', to: '/certified-pre-owned' },
-      { label: 'How refurbishment works', to: '/certified-pre-owned#process', outline: true },
-    ],
-    product: 'saturn',
-    caption: 'Saturn HC — refurbished hyperconverged node',
-    status: 'In stock',
-    chips: ['72 h burn-in soak', 'Up to 36-month warranty', 'Grades A / B / C'],
   },
   {
     key: 'solutions',

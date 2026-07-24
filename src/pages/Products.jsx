@@ -35,9 +35,6 @@ export default function Products() {
           <Button to="/products/jupiter#models" size="md">
             Storage server model numbers <ArrowRight className="h-4 w-4" />
           </Button>
-          <Button to="/certified-pre-owned" variant="outline" size="md">
-            Certified Pre-Owned stock
-          </Button>
         </div>
       </PageHero>
 

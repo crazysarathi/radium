@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { Mail, Phone, MapPin, Send, CheckCircle2 } from 'lucide-react'
+import { Mail, Phone, MapPin, Send, CheckCircle2, ShoppingCart } from 'lucide-react'
 import { PageHero, Breadcrumb, Section, Button, DraftNotice } from '@/components/ui'
+import { useEnquiry, enquiryAsText } from '@/components/enquiry/EnquiryContext'
 import { products } from '@/data/products'
 
 const inputCls =
@@ -8,11 +9,15 @@ const inputCls =
 
 export default function Contact() {
   const [sent, setSent] = useState(false)
+  const enquiry = useEnquiry()
+  const enquiryItems = enquiry?.items ?? []
+  const prefill = enquiryItems.length > 0 ? `Enquiry list:\n${enquiryAsText(enquiryItems)}\n\nProject details: ` : ''
 
   const onSubmit = (e) => {
     // PLACEHOLDER — wire to your form backend (email service, CRM webhook, etc.)
     e.preventDefault()
     setSent(true)
+    enquiry?.clear()
   }
 
   return (
@@ -21,7 +26,7 @@ export default function Contact() {
         breadcrumb={<Breadcrumb trail={[{ label: 'Home', to: '/' }, { label: 'Contact' }]} />}
         eyebrow="Contact"
         title="Request a quote"
-        body="Tell us the workload — study volume, modality mix, retention period — and whether new or Certified Pre-Owned fits the budget. A configuration comes back, not a brochure."
+        body="Tell us the workload — study volume, modality mix, retention period. A configuration comes back, not a brochure."
       />
 
       <Section tight>
@@ -48,6 +53,22 @@ export default function Contact() {
               </div>
             ) : (
               <form onSubmit={onSubmit} className="grid gap-5 sm:grid-cols-2">
+                {enquiryItems.length > 0 && (
+                  <div className="rounded-xl border border-beam/25 bg-beam/[.06] p-4 sm:col-span-2">
+                    <p className="flex items-center gap-2 text-[12.5px] font-semibold text-beam">
+                      <ShoppingCart className="h-3.5 w-3.5" />
+                      Your enquiry list is attached below
+                    </p>
+                    <ul className="mt-2.5 space-y-1">
+                      {enquiryItems.map((i) => (
+                        <li key={i.id} className="flex items-baseline justify-between gap-3 text-[13px] text-foreground/90">
+                          <span>{i.name}{i.meta ? <span className="ml-2 font-mono text-[11px] text-muted-foreground">{i.meta}</span> : null}</span>
+                          <span className="shrink-0 font-mono text-[12px] font-semibold text-beam">× {i.qty}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
                 <label className="block">
                   <span className="mb-1.5 block text-[12.5px] font-semibold text-foreground/80">Name</span>
                   <input required name="name" autoComplete="name" className={inputCls} placeholder="Your name" />
@@ -71,9 +92,7 @@ export default function Contact() {
                     {products.filter((p) => p.status === 'available').map((p) => (
                       <option key={p.slug} value={p.slug}>{p.name} — {p.tagline}</option>
                     ))}
-                    <option value="cpo">Certified Pre-Owned stock</option>
                     <option value="trade-in">Trade-in / buy-back</option>
-                    <option value="support">Support contract</option>
                     <option value="other">Something else</option>
                   </select>
                 </label>
@@ -82,8 +101,10 @@ export default function Contact() {
                   <textarea
                     required
                     name="message"
-                    rows={5}
+                    rows={enquiryItems.length > 0 ? 5 + enquiryItems.length : 5}
                     className={inputCls}
+                    key={prefill}
+                    defaultValue={prefill}
                     placeholder="Annual study volume, modality mix, retention period, site count — whatever you know today."
                   />
                 </label>

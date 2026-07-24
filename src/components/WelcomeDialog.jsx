@@ -1,14 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
 import { Button } from './ui'
 
 const STORAGE_KEY = 'radium:welcome-seen'
-
-const FEATURED = [
-  { name: 'Radium Jupiter', tagline: 'Storage Server', to: '/products/jupiter', src: '/products/jupiter/front-45.jpg' },
-  { name: 'Radium Mercury', tagline: 'High Performance Compute', to: '/products/mercury', src: '/products/mercury/front-45.jpg' },
-]
 
 /**
  * The Radium "half-circle atom" — the mark's arc fan and sweeping dot rings,
@@ -152,77 +146,69 @@ export default function WelcomeDialog() {
   if (!open) return null
 
   return (
-    <div
-      className="fixed inset-0 z-[80] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm animate-in fade-in duration-300"
-      onClick={(e) => e.target === e.currentTarget && dismiss()}
-    >
+    <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm animate-in fade-in duration-300">
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="welcome-title"
         aria-describedby="welcome-desc"
-        className="glass relative w-full max-w-2xl overflow-hidden px-6 py-9 text-center shadow-card ring-1 ring-inset ring-white/5 animate-in fade-in zoom-in-95 slide-in-from-bottom-4 duration-500 sm:px-12"
+        className="glass relative grid w-full max-w-5xl overflow-hidden shadow-card ring-1 ring-inset ring-white/5 animate-in fade-in zoom-in-95 slide-in-from-bottom-4 duration-500 md:min-h-[440px] md:grid-cols-[minmax(0,380px),1fr]"
       >
-        {/* The big atom — fan of arcs + sweeping dots out of the corner */}
-        <AtomFan className="pointer-events-none absolute -bottom-4 -left-4 h-[340px] w-[340px] [filter:drop-shadow(0_0_8px_rgba(255,77,94,.4))] [mask-image:radial-gradient(120%_120%_at_0%_100%,black_38%,transparent_70%)] sm:h-[430px] sm:w-[430px]" />
-        {/* Corner glow anchoring the fan */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-beam/25 blur-[90px]"
-        />
-        {/* Soft beam glow bleeding in from the top edge */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 -top-24 h-48 bg-[radial-gradient(60%_100%_at_50%_0%,rgba(255,77,94,.16),transparent_70%)]"
-        />
+        {/* Visual panel — the big atom, full bleed */}
+        <div className="relative h-44 overflow-hidden bg-gradient-to-br from-ink-700 to-ink-800 md:h-auto md:border-r md:border-white/5">
+          <AtomFan className="pointer-events-none absolute -bottom-10 -left-10 h-[420px] w-[420px] [filter:drop-shadow(0_0_10px_rgba(255,77,94,.45))] md:h-[560px] md:w-[560px]" />
+          {/* Corner glow anchoring the fan */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -bottom-24 -left-24 h-80 w-80 rounded-full bg-beam/30 blur-[100px]"
+          />
+          <img
+            src="/radium-logo.svg"
+            alt="Radium Computers"
+            className="absolute left-6 top-6 h-9 w-auto drop-shadow-[0_2px_8px_rgba(0,0,0,.5)]"
+          />
+        </div>
 
-        <div className="relative">
-          <img src="/radium-logo.svg" alt="Radium Computers" className="mx-auto h-11 w-auto" />
+        {/* Content — headline up top, description + actions anchored at the bottom */}
+        <div className="relative flex flex-col p-7 sm:p-10">
+          {/* Soft beam glow bleeding in from the top edge */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 -top-24 h-48 bg-[radial-gradient(70%_100%_at_50%_0%,rgba(255,77,94,.14),transparent_70%)]"
+          />
 
-          <p className="t-eyebrow mt-6 text-beam/80">Welcome to Radium</p>
-          <h2 id="welcome-title" className="t-h3 mt-2.5 text-foreground">
-            Hardware engineered for <span className="text-grad">medical imaging</span>
-          </h2>
-          <p id="welcome-desc" className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-muted-foreground">
-            High-performance compute, SAN/NAS storage servers, expansion pods, workstations and
-            IoMT edge devices — built for PACS, VNA and enterprise imaging workloads.
-          </p>
+          <div className="relative">
+            <p className="t-eyebrow text-beam/80">Welcome to Radium</p>
+            <h2 id="welcome-title" className="t-h2 mt-3 max-w-xl text-foreground">
+              Hardware engineered for <span className="text-grad">medical imaging</span>
+            </h2>
 
-          <div className="mx-auto mt-7 grid max-w-md grid-cols-2 gap-4">
-            {FEATURED.map((p) => (
-              <Link
-                key={p.to}
-                to={p.to}
-                onClick={dismiss}
-                className="group rounded-2xl border border-white/10 bg-ink-800/85 p-3 text-left backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-beam/50 hover:shadow-glow"
-              >
-                <div className="overflow-hidden rounded-xl bg-white p-2">
-                  <img
-                    src={p.src}
-                    alt={p.name}
-                    loading="lazy"
-                    className="h-24 w-full object-contain transition-transform duration-500 group-hover:scale-105 sm:h-28"
-                  />
-                </div>
-                <div className="mt-2.5 flex items-center justify-between gap-2 px-1">
-                  <div>
-                    <div className="text-sm font-semibold text-foreground group-hover:text-beam">{p.name}</div>
-                    <div className="text-[11px] text-muted-foreground">{p.tagline}</div>
-                  </div>
-                  <ArrowRight className="h-3.5 w-3.5 shrink-0 text-beam opacity-0 transition-all duration-300 group-hover:translate-x-0.5 group-hover:opacity-100" />
-                </div>
-              </Link>
-            ))}
+            <div className="mt-6 flex flex-wrap gap-2">
+              {['Compute', 'Storage', 'Workstations', 'Edge & IoMT'].map((chip) => (
+                <span
+                  key={chip}
+                  className="rounded-full border border-beam/25 bg-beam/[.07] px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-foreground/80"
+                >
+                  {chip}
+                </span>
+              ))}
+            </div>
           </div>
 
-          <div className="mt-8 flex flex-col-reverse items-center justify-center gap-3 sm:flex-row">
-            <Button variant="outline" size="md" onClick={dismiss}>
-              Got it
-            </Button>
-            <Button ref={okRef} to="/products" size="md" onClick={dismiss}>
-              Explore products
-              <ArrowRight className="h-4 w-4" />
-            </Button>
+          <div className="relative mt-10 flex flex-1 flex-col justify-end gap-6 md:flex-row md:items-end md:justify-between">
+            <p id="welcome-desc" className="max-w-md text-sm leading-relaxed text-muted-foreground">
+              High-performance compute, SAN/NAS storage servers, expansion pods, workstations and
+              IoMT edge devices — built for PACS, VNA and enterprise imaging workloads.
+            </p>
+            <div className="flex shrink-0 flex-col-reverse gap-3 sm:flex-row sm:items-center">
+              <Button variant="outline" size="md" onClick={dismiss}>
+                Got it
+              </Button>
+              <Button ref={okRef} to="/products" size="md" onClick={dismiss}>
+                Explore products
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
       </div>

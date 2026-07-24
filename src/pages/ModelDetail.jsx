@@ -1,12 +1,14 @@
 import { Navigate, Link, useParams } from 'react-router-dom'
-import { ArrowRight, ArrowLeft, FileText } from 'lucide-react'
+import { ArrowRight, ArrowLeft, FileText, ShoppingCart } from 'lucide-react'
 import ProductGallery from '@/components/ProductGallery'
 import { PageHero, Breadcrumb, Section, SpecTable, Badge, Button, DraftNotice, SplitText } from '@/components/ui'
+import { useEnquiry } from '@/components/enquiry/EnquiryContext'
 import { getModel, getProduct, jupiterModels, commonSpecs } from '@/data/products'
 import { formatCapacity } from '@/lib/utils'
 
 export default function ModelDetail() {
   const { code } = useParams()
+  const enquiry = useEnquiry()
   const model = getModel(code)
   if (!model) return <Navigate to="/products/jupiter" replace />
 
@@ -61,6 +63,23 @@ export default function ModelDetail() {
         <div className="mt-8 flex flex-wrap gap-3">
           <Button to="/contact" size="lg">
             Request a quote <ArrowRight className="h-4 w-4" />
+          </Button>
+          <Button
+            as="button"
+            type="button"
+            variant="outline"
+            size="lg"
+            onClick={() => {
+              enquiry?.add({
+                id: `model:${model.code}`,
+                name: model.name,
+                meta: `${model.bays}-bay · ${formatCapacity(model.rawCapacityTb)} raw`,
+                family: 'jupiter',
+              })
+              enquiry?.openDrawer()
+            }}
+          >
+            <ShoppingCart className="h-4 w-4" /> Add to enquiry
           </Button>
           <Button to="/products/jupiter#models" variant="outline" size="lg">
             <ArrowLeft className="h-4 w-4" /> All Jupiter models

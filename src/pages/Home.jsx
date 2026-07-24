@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   ArrowRight, Server, HardDrive, Monitor, Cpu, ShieldCheck,
-  Layers, Wrench, Recycle, CheckCircle2, Box,
+  Layers, Wrench, CheckCircle2, Box,
 } from 'lucide-react'
 import ChassisArt from '@/components/ChassisArt'
 import ProductCard from '@/components/ProductCard'
@@ -11,7 +11,6 @@ import { ThemeBackdrop, ThemeZone } from '@/components/ThemeField'
 import { Button, Eyebrow, Section, SectionHead, Tilt, SplitText } from '@/components/ui'
 import { products, categories, jupiterModels, decodeModelNumber } from '@/data/products'
 import { solutions } from '@/data/site'
-import { conditionGrades } from '@/data/refurbished'
 import { formatCapacity } from '@/lib/utils'
 
 const CAT_ICON = { compute: Cpu, storage: HardDrive, chassis: Box, workstation: Monitor, edge: Server }
@@ -213,68 +212,11 @@ function SolutionsStrip() {
 
 /* ------------------------------------------------------------------ */
 
-function PreOwnedBand() {
-  return (
-    <Section id="cpo">
-      <div className="glass relative overflow-hidden p-8 shadow-card md:p-14">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute right-[-15%] top-[-40%] h-[420px] w-[420px] rounded-full opacity-50 blur-[100px]"
-          style={{ background: 'radial-gradient(circle, rgba(255,77,94,.35), transparent 70%)' }}
-        />
-        <div className="relative grid gap-12 lg:grid-cols-[1fr_1fr]">
-          <div>
-            <Eyebrow>Certified Pre-Owned</Eyebrow>
-            <SplitText as="h2" gradient text="Used hardware, held to the new-hardware standard" className="t-h2 mt-4" />
-            <p className="mt-4 max-w-lg text-[15px] leading-relaxed text-muted-foreground">
-              Ex-demo, cancelled-order and decommissioned Radium systems, taken back
-              through a six-stage refurbishment: certified data destruction, teardown,
-              new consumables, a current firmware baseline, a 72-hour burn-in, and a
-              warranty with the same escalation path as new.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Button to="/certified-pre-owned" size="lg">
-                Browse available stock <ArrowRight className="h-4 w-4" />
-              </Button>
-              <Button to="/certified-pre-owned#process" variant="outline" size="lg">
-                How refurbishment works
-              </Button>
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            {conditionGrades.map((g) => (
-              <div key={g.key} className="reveal rounded-xl border border-white/[.08] bg-[#1a0709]/45 p-5">
-                <div className="flex items-center gap-3">
-                  <span
-                    className="flex h-9 w-9 items-center justify-center rounded-lg font-mono text-sm font-bold"
-                    style={{ background: `${g.accent}1f`, color: g.accent, border: `1px solid ${g.accent}44` }}
-                  >
-                    {g.key}
-                  </span>
-                  <div>
-                    <p className="text-sm font-bold text-foreground">{g.label}</p>
-                    <p className="text-[12px] uppercase tracking-[.12em] text-muted-foreground/85">{g.short}</p>
-                  </div>
-                </div>
-                <p className="mt-3 text-[13px] leading-relaxed text-muted-foreground">{g.body}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </Section>
-  )
-}
-
-/* ------------------------------------------------------------------ */
-
 function WhyRadium() {
   const items = [
     { icon: Layers, title: 'One line, top to bottom', body: 'Gateway, archive, compute and reading endpoint from a single vendor — one firmware baseline, one support number, no finger-pointing between suppliers.' },
     { icon: ShieldCheck, title: 'Built for retention, not refresh', body: 'Imaging archives are kept for years, not quarters. Capacity is designed to grow a drive at a time instead of forcing a migration.' },
     { icon: Wrench, title: 'Serviceable by design', body: 'Hot-swap drives, redundant power, tool-less access and out-of-band management on every rackmount product.' },
-    { icon: Recycle, title: 'A second life, certified', body: 'Systems come back, get rebuilt and get resold with a warranty — so a budget-constrained site still gets Radium-grade hardware.' },
   ]
 
   return (
@@ -311,7 +253,7 @@ function ClosingCta() {
         <SplitText as="h2" gradient text="Tell us the study volume. We will size the rest." className="t-h2 mx-auto max-w-2xl" />
         <p className="mx-auto mt-4 max-w-xl text-[15px] leading-relaxed text-muted-foreground">
           Send us modality mix, annual study count and retention period. You get back a
-          configuration, a model number and a capacity runway — new or certified pre-owned.
+          configuration, a model number and a capacity runway.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Button to="/contact" size="lg">
@@ -338,7 +280,6 @@ export default function Home() {
       <ThemeZone theme="crimson"><ProductLine /></ThemeZone>
       <ThemeZone theme="azure"><ModelDecoder /></ThemeZone>
       <ThemeZone theme="violet"><SolutionsStrip /></ThemeZone>
-      <ThemeZone theme="emerald"><PreOwnedBand /></ThemeZone>
       <ThemeZone theme="amber"><WhyRadium /></ThemeZone>
       <ThemeZone theme="crimson"><ClosingCta /></ThemeZone>
     </>

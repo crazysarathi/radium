@@ -6,7 +6,6 @@ const timeline = [
   { year: '20XX', title: 'Founded', body: 'PLACEHOLDER — the founding story and the problem the company was started to solve.' },
   { year: '20XX', title: 'First storage server shipped', body: 'PLACEHOLDER — the first Jupiter deployment and what it replaced.' },
   { year: '20XX', title: 'Line expanded to nine families', body: 'PLACEHOLDER — how the planet naming scheme and full stack came together.' },
-  { year: '20XX', title: 'Certified Pre-Owned launched', body: 'PLACEHOLDER — the take-back and refurbishment programme.' },
 ]
 
 const values = [

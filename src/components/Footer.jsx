@@ -20,7 +20,6 @@ export default function Footer() {
     {
       heading: 'Buy',
       links: [
-        { label: 'Certified Pre-Owned', to: '/certified-pre-owned' },
         { label: 'Request a quote', to: '/contact' },
         { label: 'Model number guide', to: '/products/jupiter#models' },
         { label: 'Datasheets', to: '/resources' },
@@ -30,7 +29,6 @@ export default function Footer() {
       heading: 'Company',
       links: [
         { label: 'About Radium', to: '/company' },
-        { label: 'Support', to: '/support' },
         { label: 'Resources', to: '/resources' },
         { label: 'Contact', to: '/contact' },
       ],

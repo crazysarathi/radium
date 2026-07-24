@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
-import { ChevronDown, Menu, X, Search, ArrowRight } from 'lucide-react'
+import { ChevronDown, Menu, X, Search, ShoppingCart } from 'lucide-react'
 import { nav } from '@/data/site'
 import { cn } from '@/lib/utils'
 import { Button } from './ui'
+import { useEnquiry } from './enquiry/EnquiryContext'
 
 function MegaPanel({ columns, onNavigate }) {
   return (
@@ -34,25 +35,12 @@ function MegaPanel({ columns, onNavigate }) {
           </ul>
         </div>
       ))}
-      <div className="sm:col-span-2 lg:col-span-4">
-        <div className="hairline mb-4" />
-        <Link
-          to="/certified-pre-owned"
-          onClick={onNavigate}
-          className="group/c flex items-center justify-between gap-4 rounded-xl border border-beam/20 bg-beam/[.06] px-4 py-3 transition-colors hover:border-beam/50"
-        >
-          <span className="text-sm">
-            <strong className="font-semibold text-foreground">Certified Pre-Owned</strong>
-            <span className="ml-2 text-muted-foreground">Refurbished Radium hardware, burned in and warrantied</span>
-          </span>
-          <ArrowRight className="h-4 w-4 shrink-0 text-beam transition-transform group-hover/c:translate-x-1" />
-        </Link>
-      </div>
     </div>
   )
 }
 
 export default function Header() {
+  const enquiry = useEnquiry()
   const [scrolled, setScrolled] = useState(false)
   const [openMega, setOpenMega] = useState(null)
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -160,6 +148,19 @@ export default function Header() {
             >
               <Search className="h-4 w-4" />
             </Link>
+            <button
+              type="button"
+              aria-label={`Enquiry list (${enquiry?.count ?? 0} items)`}
+              onClick={() => enquiry?.openDrawer()}
+              className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-muted-foreground transition-colors hover:border-beam/40 hover:text-beam"
+            >
+              <ShoppingCart className="h-4 w-4" />
+              {(enquiry?.count ?? 0) > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-beam px-1 text-[10px] font-bold text-[#160607]">
+                  {enquiry.count}
+                </span>
+              )}
+            </button>
             <Button to="/contact" size="sm" className="hidden sm:inline-flex">
               Request a quote
             </Button>

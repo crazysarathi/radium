@@ -1,14 +1,13 @@
 import { useState } from 'react'
 import { Navigate, Link, useParams } from 'react-router-dom'
-import { ArrowRight, Download, FileText, CheckCircle2 } from 'lucide-react'
+import { ArrowRight, Download, FileText, CheckCircle2, ShoppingCart } from 'lucide-react'
 import ProductGallery, { ProductImage } from '@/components/ProductGallery'
 import {
   PageHero, Breadcrumb, Section, SectionHead, SpecTable, Badge, Button, DraftNotice, SplitText,
 } from '@/components/ui'
-import { getProduct, getFullSpecs, products, jupiterModels } from '@/data/products'
+import { getProduct, getFullSpecs, products } from '@/data/products'
 import { chassisModelsFor, chassisRackUnits } from '@/data/chassis'
-import { refurbished } from '@/data/refurbished'
-import { formatCapacity } from '@/lib/utils'
+import { useEnquiry } from '@/components/enquiry/EnquiryContext'
 
 /**
  * AIC-style model line-up for the chassis families: photo panel, model number,
@@ -102,13 +101,13 @@ function ChassisModels({ product }) {
 
 export default function ProductFamily() {
   const { slug } = useParams()
+  const enquiry = useEnquiry()
   const product = getProduct(slug)
   if (!product) return <Navigate to="/products" replace />
 
   const roadmap = product.status === 'roadmap'
   const fullSpecs = getFullSpecs(product)
   const related = products.filter((p) => p.slug !== product.slug && p.status === 'available').slice(0, 3)
-  const cpo = refurbished.filter((r) => r.family === product.slug)
 
   return (
     <>
@@ -131,6 +130,20 @@ export default function ProductFamily() {
           <Button to="/contact" size="lg">
             Request a quote <ArrowRight className="h-4 w-4" />
           </Button>
+          {!roadmap && (
+            <Button
+              as="button"
+              type="button"
+              variant="outline"
+              size="lg"
+              onClick={() => {
+                enquiry?.add({ id: `product:${product.slug}`, name: product.name, meta: product.tagline, family: product.slug })
+                enquiry?.openDrawer()
+              }}
+            >
+              <ShoppingCart className="h-4 w-4" /> Add to enquiry
+            </Button>
+          )}
           {product.hasModels && (
             <Button href="#models" variant="outline" size="lg">
               View model numbers
@@ -218,26 +231,6 @@ export default function ProductFamily() {
                 </li>
               ))}
             </ul>
-          </div>
-        </Section>
-      )}
-
-      {/* CPO stock for this family */}
-      {cpo.length > 0 && (
-        <Section tight>
-          <div className="reveal glass flex flex-col gap-5 p-6 md:flex-row md:items-center md:justify-between md:p-8">
-            <div>
-              <Badge tone="good">Certified Pre-Owned</Badge>
-              <h2 className="t-h3 mt-3 text-foreground">
-                {cpo.reduce((n, r) => n + r.quantity, 0)} refurbished {product.series} units in stock
-              </h2>
-              <p className="mt-2 max-w-lg text-[13.5px] text-muted-foreground">
-                Same chassis, rebuilt to the current firmware baseline and warrantied.
-              </p>
-            </div>
-            <Button to="/certified-pre-owned" size="lg" className="shrink-0">
-              View stock <ArrowRight className="h-4 w-4" />
-            </Button>
           </div>
         </Section>
       )}

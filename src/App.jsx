@@ -6,6 +6,8 @@ import BackToTop from '@/components/BackToTop'
 import WelcomeDialog from '@/components/WelcomeDialog'
 import { CompareProvider } from '@/components/compare/CompareContext'
 import CompareBar from '@/components/compare/CompareBar'
+import { EnquiryProvider } from '@/components/enquiry/EnquiryContext'
+import EnquiryDrawer from '@/components/enquiry/EnquiryDrawer'
 import { SmoothScroll, ScrollManager, RevealObserver } from '@/components/SiteEffects'
 import Home from '@/pages/Home'
 
@@ -14,10 +16,7 @@ import Home from '@/pages/Home'
 const Products = lazy(() => import('@/pages/Products'))
 const ProductFamily = lazy(() => import('@/pages/ProductFamily'))
 const ModelDetail = lazy(() => import('@/pages/ModelDetail'))
-const CertifiedPreOwned = lazy(() => import('@/pages/CertifiedPreOwned'))
-const RefurbDetail = lazy(() => import('@/pages/RefurbDetail'))
 const Solutions = lazy(() => import('@/pages/Solutions'))
-const Support = lazy(() => import('@/pages/Support'))
 const Resources = lazy(() => import('@/pages/Resources'))
 const Company = lazy(() => import('@/pages/Company'))
 const Contact = lazy(() => import('@/pages/Contact'))
@@ -34,6 +33,7 @@ function RouteFallback() {
 export default function App() {
   return (
     <CompareProvider>
+      <EnquiryProvider>
       <SmoothScroll />
       <ScrollManager />
       <RevealObserver />
@@ -45,10 +45,7 @@ export default function App() {
             <Route path="/products" element={<Products />} />
             <Route path="/products/:slug" element={<ProductFamily />} />
             <Route path="/products/jupiter/:code" element={<ModelDetail />} />
-            <Route path="/certified-pre-owned" element={<CertifiedPreOwned />} />
-            <Route path="/certified-pre-owned/:id" element={<RefurbDetail />} />
             <Route path="/solutions" element={<Solutions />} />
-            <Route path="/support" element={<Support />} />
             <Route path="/resources" element={<Resources />} />
             <Route path="/company" element={<Company />} />
             <Route path="/contact" element={<Contact />} />
@@ -59,7 +56,9 @@ export default function App() {
       <Footer />
       <BackToTop />
       <CompareBar />
+      <EnquiryDrawer />
       <WelcomeDialog />
+      </EnquiryProvider>
     </CompareProvider>
   )
 }

@@ -36,9 +36,7 @@ export const nav = [
       },
     ],
   },
-  { label: 'Certified Pre-Owned', to: '/certified-pre-owned' },
   { label: 'Solutions', to: '/solutions' },
-  { label: 'Support', to: '/support' },
   { label: 'Resources', to: '/resources' },
   { label: 'Company', to: '/company' },
 ]
@@ -82,12 +80,6 @@ export const solutions = [
   },
 ]
 
-export const supportTiers = [
-  { name: 'Standard', response: 'Next business day', hours: '9×5', parts: 'NBD advance replacement', body: 'PLACEHOLDER — the baseline warranty that ships with every Radium system.' },
-  { name: 'Enhanced', response: '4-hour response', hours: '24×7', parts: '4-hour parts delivery', body: 'PLACEHOLDER — for production archives where the reading room stops without them.' },
-  { name: 'Mission Critical', response: '2-hour on-site', hours: '24×7', parts: 'On-site spares kit', body: 'PLACEHOLDER — named engineer, held spares, quarterly health review.' },
-]
-
 export const resources = [
   { type: 'Datasheet', title: 'Radium Jupiter SS — Storage Server', meta: 'PDF · 2.1 MB', tag: 'jupiter' },
   { type: 'Datasheet', title: 'Radium Mercury — High Performance Compute', meta: 'PDF · 1.8 MB', tag: 'mercury' },
@@ -97,12 +89,11 @@ export const resources = [
   { type: 'White paper', title: 'SAN vs NAS for Medical Imaging Workloads', meta: 'PDF · 2.6 MB', tag: 'storage' },
   { type: 'Manual', title: 'Jupiter — Rack Installation & Cabling', meta: 'PDF · 5.1 MB', tag: 'jupiter' },
   { type: 'Manual', title: 'Io — Daisy-Chain Expansion Procedure', meta: 'PDF · 2.9 MB', tag: 'io' },
-  { type: 'Compliance', title: 'NIST 800-88 Data Destruction Statement', meta: 'PDF · 410 KB', tag: 'cpo' },
 ]
 
 export const stats = [
   { value: '12', label: 'Product families' },
   { value: '24', label: 'Bays per Jupiter chassis' },
-  { value: '72h', label: 'CPO burn-in soak' },
-  { value: '36mo', label: 'Max CPO warranty' },
+  { value: '99.999%', label: 'Uptime target' },
+  { value: '24×7', label: 'Escalation path' },
 ]
