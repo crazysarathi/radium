@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import BackToTop from '@/components/BackToTop'
+import WelcomeDialog from '@/components/WelcomeDialog'
 import { CompareProvider } from '@/components/compare/CompareContext'
 import CompareBar from '@/components/compare/CompareBar'
 import { SmoothScroll, ScrollManager, RevealObserver } from '@/components/SiteEffects'
@@ -58,6 +59,7 @@ export default function App() {
       <Footer />
       <BackToTop />
       <CompareBar />
+      <WelcomeDialog />
     </CompareProvider>
   )
 }
