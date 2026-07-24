@@ -112,7 +112,7 @@ export default function Header() {
       >
         <div className="container flex h-[72px] items-center justify-between gap-6">
           <Link to="/" className="shrink-0" aria-label="Radium — home">
-            <img src="/radium-logo-dark.svg" alt="Radium" className="h-9 w-auto md:h-10" width="220" height="70" />
+            <img src="/radium-logo.svg" alt="Radium" className="h-15 w-auto md:h-12" />
           </Link>
 
           <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary">
