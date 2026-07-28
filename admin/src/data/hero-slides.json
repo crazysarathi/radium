@@ -1,0 +1,83 @@
+[
+  {
+    "id": "archive",
+    "theme": "crimson",
+    "eyebrow": "Radium® Computer Hardware",
+    "title": "Hardware built for the archive that can never go down.",
+    "body": "Compute, SAN/NAS storage, expansion pods, reading workstations and IoMT gateways — one hardware line engineered end to end for PACS, VNA and enterprise medical imaging.",
+    "ctas": [
+      {
+        "label": "Explore the product line",
+        "to": "/products"
+      },
+      {
+        "label": "Request a quote",
+        "to": "/contact",
+        "outline": true
+      }
+    ],
+    "product": "jupiter",
+    "caption": "Jupiter SS 242016 — 24-bay storage server",
+    "status": "In production",
+    "chips": [
+      "12 product families",
+      "24-bay Jupiter chassis",
+      "99.999% uptime target"
+    ],
+    "enabled": true
+  },
+  {
+    "id": "storage",
+    "theme": "crimson",
+    "eyebrow": "SAN / NAS / Expansion",
+    "title": "Storage that grows a drive at a time, not a forklift at a time.",
+    "body": "Jupiter storage servers and Io expansion pods scale the archive bay by bay. Read the six-digit model number and you already know the capacity runway left in the chassis.",
+    "ctas": [
+      {
+        "label": "Storage servers",
+        "to": "/products/jupiter"
+      },
+      {
+        "label": "Decode a model number",
+        "href": "#model-numbers",
+        "outline": true
+      }
+    ],
+    "product": "io",
+    "caption": "Io JB — 24-bay expansion pod",
+    "status": "Shipping now",
+    "chips": [
+      "Model number = spec sheet",
+      "Bay-level scaling",
+      "One firmware baseline"
+    ],
+    "enabled": true
+  },
+  {
+    "id": "solutions",
+    "theme": "crimson",
+    "eyebrow": "Solutions",
+    "title": "From modality to reading room, one vendor on the hook.",
+    "body": "IoMT gateways at the modality, the archive in the rack, workstations in the reading room — specified as one system, quoted as one path, backed by one support number.",
+    "ctas": [
+      {
+        "label": "Explore solutions",
+        "to": "/solutions"
+      },
+      {
+        "label": "Request a quote",
+        "to": "/contact",
+        "outline": true
+      }
+    ],
+    "product": "mercury",
+    "caption": "Mercury RS — 1U short-depth gateway",
+    "status": "Configure to order",
+    "chips": [
+      "PACS / VNA / AI",
+      "Edge to core",
+      "One support number"
+    ],
+    "enabled": true
+  }
+]

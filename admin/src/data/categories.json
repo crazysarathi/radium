@@ -1,0 +1,32 @@
+[
+  {
+    "id": "compute",
+    "key": "compute",
+    "label": "Compute",
+    "blurb": "Application and database servers"
+  },
+  {
+    "id": "storage",
+    "key": "storage",
+    "label": "Storage",
+    "blurb": "SAN / NAS servers and expansion"
+  },
+  {
+    "id": "chassis",
+    "key": "chassis",
+    "label": "Chassis",
+    "blurb": "Server, industrial PC and ES1 chassis"
+  },
+  {
+    "id": "workstation",
+    "key": "workstation",
+    "label": "Workstations",
+    "blurb": "Reading and reporting desktops"
+  },
+  {
+    "id": "edge",
+    "key": "edge",
+    "label": "Edge & IoMT",
+    "blurb": "Connected medical devices"
+  }
+]
