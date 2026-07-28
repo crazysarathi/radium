@@ -1,0 +1,304 @@
+[
+  {
+    "id": "rail-kit-28",
+    "name": "Sliding Rail Kit — 28\"",
+    "sku": "RAD-ACC-RK28",
+    "category": "Mounting",
+    "description": "Tool-less sliding rails for 19\" EIA-310 racks, 24\" – 32\" post depth. One kit per chassis.",
+    "for": [
+      "mercury",
+      "jupiter",
+      "io",
+      "saturn",
+      "server-chassis",
+      "es1-chassis"
+    ],
+    "status": "available"
+  },
+  {
+    "id": "rail-kit-short",
+    "name": "Short-Depth Rail Kit — 20\"",
+    "sku": "RAD-ACC-RK20",
+    "category": "Mounting",
+    "description": "Fixed rails for short-depth industrial racks and wall cabinets.",
+    "for": [
+      "industrial-pc"
+    ],
+    "status": "available"
+  },
+  {
+    "id": "drive-tray-35",
+    "name": "3.5\" Hot-Swap Drive Carrier",
+    "sku": "RAD-ACC-DT35",
+    "category": "Storage",
+    "description": "Spare tool-less carrier for 3.5\" SAS / SATA drives. Keep two per site as cold spares.",
+    "for": [
+      "jupiter",
+      "io",
+      "saturn",
+      "server-chassis"
+    ],
+    "status": "available"
+  },
+  {
+    "id": "drive-tray-25",
+    "name": "2.5\" Hot-Swap Drive Carrier",
+    "sku": "RAD-ACC-DT25",
+    "category": "Storage",
+    "description": "Spare tool-less carrier for 2.5\" NVMe / SAS / SATA media.",
+    "for": [
+      "mercury",
+      "es1-chassis",
+      "server-chassis"
+    ],
+    "status": "available"
+  },
+  {
+    "id": "hdd-16tb",
+    "name": "Enterprise HDD — 16 TB SAS",
+    "sku": "RAD-ACC-HD16",
+    "category": "Storage",
+    "description": "16 TB 7200 rpm enterprise SAS drive, burn-in tested and firmware-matched to the array.",
+    "for": [
+      "jupiter",
+      "io",
+      "saturn"
+    ],
+    "status": "available"
+  },
+  {
+    "id": "hdd-20tb",
+    "name": "Enterprise HDD — 20 TB SAS",
+    "sku": "RAD-ACC-HD20",
+    "category": "Storage",
+    "description": "20 TB 7200 rpm enterprise SAS drive for capacity expansion a bay at a time.",
+    "for": [
+      "jupiter",
+      "io",
+      "saturn"
+    ],
+    "status": "available"
+  },
+  {
+    "id": "nvme-cache-kit",
+    "name": "NVMe Cache Kit — 2 × 1.6 TB U.2",
+    "sku": "RAD-ACC-NVC2",
+    "category": "Storage",
+    "description": "Mirrored U.2 NVMe pair for the read/write cache tier ahead of the HDD pool.",
+    "for": [
+      "mercury",
+      "jupiter"
+    ],
+    "status": "available"
+  },
+  {
+    "id": "psu-800",
+    "name": "Redundant PSU Module — 800 W",
+    "sku": "RAD-ACC-PS08",
+    "category": "Power",
+    "description": "Hot-swap 800 W CRPS module, 80 PLUS Platinum. Field-replaceable without downtime.",
+    "for": [
+      "mercury",
+      "jupiter",
+      "saturn",
+      "server-chassis",
+      "industrial-pc"
+    ],
+    "status": "available"
+  },
+  {
+    "id": "psu-1600",
+    "name": "Redundant PSU Module — 1600 W",
+    "sku": "RAD-ACC-PS16",
+    "category": "Power",
+    "description": "Hot-swap 1600 W CRPS module for high-TDP and storage-dense builds.",
+    "for": [
+      "io",
+      "server-chassis",
+      "es1-chassis"
+    ],
+    "status": "available"
+  },
+  {
+    "id": "fan-module",
+    "name": "Hot-Swap Fan Module",
+    "sku": "RAD-ACC-FAN8",
+    "category": "Cooling",
+    "description": "8038 PWM hot-swap fan module. Swaps from the top without opening the airflow path.",
+    "for": [
+      "mercury",
+      "jupiter",
+      "io",
+      "server-chassis",
+      "es1-chassis"
+    ],
+    "status": "available"
+  },
+  {
+    "id": "nic-10g",
+    "name": "Dual-Port 10GbE NIC",
+    "sku": "RAD-ACC-N10G",
+    "category": "Networking",
+    "description": "Dual SFP+ 10GbE adapter for the archive and reading-room uplinks.",
+    "for": [
+      "mercury",
+      "jupiter",
+      "saturn",
+      "neptune"
+    ],
+    "status": "available"
+  },
+  {
+    "id": "nic-25g",
+    "name": "Dual-Port 25GbE NIC",
+    "sku": "RAD-ACC-N25G",
+    "category": "Networking",
+    "description": "Dual SFP28 25GbE adapter for high-throughput ingest and AI training pulls.",
+    "for": [
+      "mercury",
+      "jupiter"
+    ],
+    "status": "available"
+  },
+  {
+    "id": "raid-bbu",
+    "name": "RAID Controller Battery Backup",
+    "sku": "RAD-ACC-BBU1",
+    "category": "Storage",
+    "description": "Supercap backup for the battery-backed RAID cache. Replace every 3 – 5 years.",
+    "for": [
+      "jupiter",
+      "saturn",
+      "server-chassis"
+    ],
+    "status": "available"
+  },
+  {
+    "id": "sas-cable",
+    "name": "SAS Expansion Cable — 2 m",
+    "sku": "RAD-ACC-SAS2",
+    "category": "Cabling",
+    "description": "SFF-8644 to SFF-8644 cable for daisy-chaining Io pods to a Jupiter head.",
+    "for": [
+      "jupiter",
+      "io"
+    ],
+    "status": "available"
+  },
+  {
+    "id": "ram-64-rdimm",
+    "name": "Memory Kit — 64 GB DDR5 RDIMM",
+    "sku": "RAD-ACC-M64R",
+    "category": "Memory",
+    "description": "ECC RDIMM kit, validated against the Mercury and Jupiter memory maps.",
+    "for": [
+      "mercury",
+      "jupiter"
+    ],
+    "status": "available"
+  },
+  {
+    "id": "ram-32-sodimm",
+    "name": "Memory Kit — 32 GB DDR5 SODIMM",
+    "sku": "RAD-ACC-M32S",
+    "category": "Memory",
+    "description": "SODIMM kit for the small-form-factor and edge platforms.",
+    "for": [
+      "mars",
+      "pluto"
+    ],
+    "status": "available"
+  },
+  {
+    "id": "gpu-workstation",
+    "name": "Workstation GPU — 16 GB",
+    "sku": "RAD-ACC-GPU16",
+    "category": "Graphics",
+    "description": "Full-height workstation GPU for 3D, MPR and reconstruction workloads.",
+    "for": [
+      "neptune"
+    ],
+    "status": "available"
+  },
+  {
+    "id": "diag-display-5mp",
+    "name": "Diagnostic Display — 5 MP Greyscale",
+    "sku": "RAD-ACC-DD5M",
+    "category": "Display",
+    "description": "5 MP 10-bit greyscale panel with calibration sensor, DICOM GSDF tracked.",
+    "for": [
+      "neptune",
+      "mars"
+    ],
+    "status": "available"
+  },
+  {
+    "id": "vesa-mount",
+    "name": "VESA Mounting Bracket",
+    "sku": "RAD-ACC-VESA",
+    "category": "Mounting",
+    "description": "100 × 100 VESA bracket to hang the unit behind a display or under a counter.",
+    "for": [
+      "mars",
+      "pluto"
+    ],
+    "status": "available"
+  },
+  {
+    "id": "din-rail-kit",
+    "name": "DIN Rail Mounting Kit",
+    "sku": "RAD-ACC-DIN1",
+    "category": "Mounting",
+    "description": "DIN rail clip set for cabinet installation next to the modality.",
+    "for": [
+      "pluto"
+    ],
+    "status": "available"
+  },
+  {
+    "id": "dc-psu-adapter",
+    "name": "Wide-Range DC Power Adapter",
+    "sku": "RAD-ACC-DC36",
+    "category": "Power",
+    "description": "9 – 36 V DC adapter with locking connector for edge and cart installations.",
+    "for": [
+      "mars",
+      "pluto"
+    ],
+    "status": "available"
+  },
+  {
+    "id": "lte-module",
+    "name": "Wi-Fi / LTE Expansion Module",
+    "sku": "RAD-ACC-LTE1",
+    "category": "Networking",
+    "description": "M.2 wireless module with external antenna kit for mobile imaging units.",
+    "for": [
+      "pluto"
+    ],
+    "status": "available"
+  },
+  {
+    "id": "dust-filter-kit",
+    "name": "Intake Dust Filter Kit",
+    "sku": "RAD-ACC-FLT1",
+    "category": "Cooling",
+    "description": "Washable intake filters for industrial and plant-floor installations. Pack of 3.",
+    "for": [
+      "industrial-pc"
+    ],
+    "status": "available"
+  },
+  {
+    "id": "front-door-lock",
+    "name": "Locking Front Door",
+    "sku": "RAD-ACC-LCK1",
+    "category": "Security",
+    "description": "Keyed locking front door to stop drive and media removal on open sites.",
+    "for": [
+      "industrial-pc",
+      "server-chassis"
+    ],
+    "status": "available"
+  }
+]

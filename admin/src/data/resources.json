@@ -1,0 +1,66 @@
+[
+  {
+    "id": "res-1",
+    "type": "Datasheet",
+    "title": "Radium Jupiter SS — Storage Server",
+    "meta": "PDF · 2.1 MB",
+    "tag": "jupiter",
+    "status": "published"
+  },
+  {
+    "id": "res-2",
+    "type": "Datasheet",
+    "title": "Radium Mercury — High Performance Compute",
+    "meta": "PDF · 1.8 MB",
+    "tag": "mercury",
+    "status": "published"
+  },
+  {
+    "id": "res-3",
+    "type": "Datasheet",
+    "title": "Radium Io — Expansion Storage Pod",
+    "meta": "PDF · 1.2 MB",
+    "tag": "io",
+    "status": "published"
+  },
+  {
+    "id": "res-4",
+    "type": "Guide",
+    "title": "Model Number Reference — Storage Servers",
+    "meta": "PDF · 640 KB",
+    "tag": "jupiter",
+    "status": "published"
+  },
+  {
+    "id": "res-5",
+    "type": "Guide",
+    "title": "Sizing a PACS Archive for 7-Year Retention",
+    "meta": "PDF · 3.4 MB",
+    "tag": "solutions",
+    "status": "published"
+  },
+  {
+    "id": "res-6",
+    "type": "White paper",
+    "title": "SAN vs NAS for Medical Imaging Workloads",
+    "meta": "PDF · 2.6 MB",
+    "tag": "storage",
+    "status": "published"
+  },
+  {
+    "id": "res-7",
+    "type": "Manual",
+    "title": "Jupiter — Rack Installation & Cabling",
+    "meta": "PDF · 5.1 MB",
+    "tag": "jupiter",
+    "status": "published"
+  },
+  {
+    "id": "res-8",
+    "type": "Manual",
+    "title": "Io — Daisy-Chain Expansion Procedure",
+    "meta": "PDF · 2.9 MB",
+    "tag": "io",
+    "status": "published"
+  }
+]
