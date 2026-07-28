@@ -7,7 +7,7 @@ import { getProduct } from '@/data/products'
 import { imagesFor } from '@/data/productImages'
 import { THEMES, useThemeZone } from '@/components/ThemeField'
 
-const AUTOPLAY_MS = 4000
+const AUTOPLAY_MS = 9000
 
 /**
  * AIC-style hero carousel: full-screen slides, each with its own colour mood

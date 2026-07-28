@@ -54,6 +54,7 @@ function ChassisModels({ product }) {
         {shown.map((m) => (
           <div
             key={m.id}
+            id={m.id}
             className="reveal group flex h-full flex-col overflow-hidden rounded-glass border border-white/[.08] bg-[rgba(30,12,14,.55)] backdrop-blur-[12px] transition-[border-color,box-shadow] duration-300 hover:border-beam/40 hover:shadow-[0_0_38px_-8px_rgba(255,77,94,.35)]"
           >
             <div className="border-b border-white/[.06] bg-white p-5">

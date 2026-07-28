@@ -37,7 +37,8 @@ export function ProductImage({ product, className }) {
 
   // White studio panel; the photo paints progressively as it streams in.
   return (
-    <div className={cn('overflow-hidden bg-white', className)}>
+    // <div className={cn('overflow-hidden bg-white', className)}>
+     <div className={cn('overflow-hidden bg-whites', className)}>
       <img
         src={src}
         alt={product?.name ?? 'Radium hardware'}

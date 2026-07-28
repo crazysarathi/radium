@@ -5,6 +5,7 @@ import { nav } from '@/data/site'
 import { cn } from '@/lib/utils'
 import { Button } from './ui'
 import { useEnquiry } from './enquiry/EnquiryContext'
+import SearchPalette from './SearchPalette'
 
 function MegaPanel({ columns, onNavigate }) {
   return (
@@ -44,6 +45,7 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false)
   const [openMega, setOpenMega] = useState(null)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false)
   const closeTimer = useRef(null)
   const { pathname } = useLocation()
 
@@ -57,6 +59,7 @@ export default function Header() {
   useEffect(() => {
     setMobileOpen(false)
     setOpenMega(null)
+    setSearchOpen(false)
   }, [pathname])
 
   useEffect(() => {
@@ -67,7 +70,16 @@ export default function Header() {
   }, [mobileOpen])
 
   useEffect(() => {
-    const onKey = (e) => e.key === 'Escape' && (setOpenMega(null), setMobileOpen(false))
+    const onKey = (e) => {
+      if (e.key === 'Escape') {
+        setOpenMega(null)
+        setMobileOpen(false)
+        setSearchOpen(false)
+      } else if (e.key.toLowerCase() === 'k' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault()
+        setSearchOpen((o) => !o)
+      }
+    }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [])
@@ -141,13 +153,14 @@ export default function Header() {
           </nav>
 
           <div className="flex items-center gap-2">
-            <Link
-              to="/resources"
-              aria-label="Search resources"
-              className="hidden h-10 w-10 items-center justify-center rounded-full border border-white/10 text-muted-foreground transition-colors hover:border-beam/40 hover:text-beam md:inline-flex"
+            <button
+              type="button"
+              aria-label="Search products"
+              onClick={() => setSearchOpen(true)}
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-muted-foreground transition-colors hover:border-beam/40 hover:text-beam"
             >
               <Search className="h-4 w-4" />
-            </Link>
+            </button>
             <button
               type="button"
               aria-label={`Enquiry list (${enquiry?.count ?? 0} items)`}
@@ -199,6 +212,8 @@ export default function Header() {
             )
         )}
       </header>
+
+      <SearchPalette open={searchOpen} onClose={() => setSearchOpen(false)} />
 
       {/* Mobile drawer */}
       {mobileOpen && (

@@ -1,8 +1,166 @@
 import { useEffect, useRef, useState } from 'react'
 import { ArrowRight } from 'lucide-react'
 import { Button } from './ui'
+import { products } from '../data/products'
 
 const STORAGE_KEY = 'radium:welcome-seen'
+
+/* ------------------------------------------------------------------ */
+/* Product spotlight orbit                                             */
+/* ------------------------------------------------------------------ */
+
+/**
+ * One satellite ball per product family, orbiting the fan's corner on its
+ * own ring. Radii alternate inner/outer so consecutive spotlights hop
+ * between rings instead of marching along one arc.
+ */
+const FEATURED_ORBITS = [
+  { slug: 'mercury', radius: 20 },
+  { slug: 'jupiter', radius: 44 },
+  { slug: 'io', radius: 28 },
+  { slug: 'saturn', radius: 38 },
+  { slug: 'neptune', radius: 24 },
+  { slug: 'mars', radius: 41 },
+  { slug: 'pluto', radius: 32 },
+].map((o) => ({ ...o, name: products.find((p) => p.slug === o.slug)?.name ?? o.slug }))
+
+const ORBIT_CX = 1
+const ORBIT_CY = 67
+const ORBIT_COUNT = FEATURED_ORBITS.length
+/** Stage wedge: exactly one satellite inside it at any moment. */
+const WEDGE = 360 / ORBIT_COUNT
+const WEDGE_START = 45 - WEDGE / 2
+/** Deg/sec — each ball holds the stage for ~3s before handing over. */
+const ORBIT_SPEED = WEDGE / 3
+/** Seconds per product when motion is reduced (crossfade only). */
+const STILL_SLOT = 4
+
+const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v))
+const smoothstep = (v) => v * v * (3 - 2 * v)
+
+function ProductOrbit({ reduceMotion }) {
+  const itemsRef = useRef([])
+  const startRef = useRef(null)
+
+  useEffect(() => {
+    let raf
+    const tick = (now) => {
+      if (startRef.current == null) startRef.current = now
+      const t = (now - startRef.current) / 1000
+      const stillIndex = Math.floor(t / STILL_SLOT) % ORBIT_COUNT
+
+      FEATURED_ORBITS.forEach((orbit, i) => {
+        const el = itemsRef.current[i]
+        if (!el?.sat) return
+
+        // Angle from vertical, sweeping clockwise into the fan (matches the rings)
+        let theta
+        let env = 0
+        if (reduceMotion) {
+          theta = 15 + (i * 60) / (ORBIT_COUNT - 1)
+          if (i === stillIndex) {
+            const tau = t % STILL_SLOT
+            env = smoothstep(clamp(Math.min(tau, STILL_SLOT - tau) / 0.6, 0, 1))
+          }
+        } else {
+          theta = WEDGE_START - 6 - i * WEDGE + ORBIT_SPEED * t
+          const norm = ((theta % 360) + 360) % 360
+          const p = (norm - WEDGE_START) / WEDGE
+          if (p >= 0 && p <= 1) env = smoothstep(clamp(Math.min(p, 1 - p) / 0.16, 0, 1))
+        }
+
+        const rad = (theta * Math.PI) / 180
+        const x = ORBIT_CX + orbit.radius * Math.sin(rad)
+        const y = ORBIT_CY - orbit.radius * Math.cos(rad)
+        const dotR = 1.3 + (reduceMotion ? 0.9 : 2.1) * env
+
+        el.sat.setAttribute('cx', x)
+        el.sat.setAttribute('cy', y)
+        el.sat.setAttribute('r', dotR)
+
+        el.callout.setAttribute('opacity', env)
+        if (env <= 0.01) return
+
+        // Label anchored radially outward from the ball, clamped into view
+        const halfW = orbit.name.length * 0.93
+        const lx = clamp(ORBIT_CX + (orbit.radius + 10) * Math.sin(rad), halfW + 6, 51 - halfW)
+        const ly = clamp(ORBIT_CY - (orbit.radius + 10) * Math.cos(rad), 14, 58)
+        el.text.setAttribute('x', lx)
+        el.text.setAttribute('y', ly - 2)
+
+        // Leader arrow from the label to the rim of the zoomed ball
+        const dx = x - lx
+        const dy = y - ly
+        const len = Math.hypot(dx, dy) || 1
+        const rim = dotR + 1.9
+        el.line.setAttribute('x1', lx)
+        el.line.setAttribute('y1', ly + 0.8)
+        el.line.setAttribute('x2', x - (dx / len) * rim)
+        el.line.setAttribute('y2', y - (dy / len) * rim)
+
+        el.halo.setAttribute('cx', x)
+        el.halo.setAttribute('cy', y)
+        el.halo.setAttribute('r', dotR + 1.6)
+        el.halo.setAttribute('opacity', 0.9 * env)
+      })
+      raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [reduceMotion])
+
+  const bindRef = (i, key) => (node) => {
+    ;(itemsRef.current[i] ??= {})[key] = node
+  }
+
+  return (
+    <g className="hidden md:block">
+      <defs>
+        <marker
+          id="wd-spot-arrow"
+          markerWidth="6"
+          markerHeight="6"
+          refX="5"
+          refY="3"
+          orient="auto"
+        >
+          <path d="M0 0 L6 3 L0 6 z" fill="#ff97a1" />
+        </marker>
+      </defs>
+      {FEATURED_ORBITS.map((orbit, i) => (
+        <g key={orbit.slug}>
+          <circle ref={bindRef(i, 'sat')} r="1.3" fill="#ffb3ba" />
+          <g ref={bindRef(i, 'callout')} opacity="0">
+            <circle
+              ref={bindRef(i, 'halo')}
+              fill="none"
+              stroke="rgba(255,151,161,.85)"
+              strokeWidth=".35"
+            />
+            <line
+              ref={bindRef(i, 'line')}
+              stroke="rgba(255,151,161,.9)"
+              strokeWidth=".3"
+              markerEnd="url(#wd-spot-arrow)"
+            />
+            <text
+              ref={bindRef(i, 'text')}
+              fill="#fff"
+              fontSize="3"
+              fontWeight="600"
+              textAnchor="middle"
+              stroke="rgba(24,7,10,.55)"
+              strokeWidth=".5"
+              style={{ paintOrder: 'stroke' }}
+            >
+              {orbit.name}
+            </text>
+          </g>
+        </g>
+      ))}
+    </g>
+  )
+}
 
 /**
  * The Radium "half-circle atom" — the mark's arc fan and sweeping dot rings,
@@ -102,6 +260,9 @@ function AtomFan({ className }) {
           <use href="#wd-r6" />
         </g>
       </g>
+
+      {/* Product spotlight — one ball at a time zooms with an arrow + name */}
+      <ProductOrbit reduceMotion={reduceMotion} />
     </svg>
   )
 }
