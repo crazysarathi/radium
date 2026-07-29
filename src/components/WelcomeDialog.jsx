@@ -1,9 +1,17 @@
 import { useEffect, useRef, useState } from 'react'
-import { ArrowRight } from 'lucide-react'
+import { Activity, ArrowRight, Cpu, HardDrive, MonitorDot } from 'lucide-react'
 import { Button } from './ui'
 import { products } from '../data/products'
 
 const STORAGE_KEY = 'radium:welcome-seen'
+
+/** Category cards filling the content panel — one per line of the range. */
+const CATEGORIES = [
+  { icon: Cpu, label: 'Compute', desc: 'Mercury high-performance computers for PACS & VNA cores.' },
+  { icon: HardDrive, label: 'Storage', desc: 'Jupiter & Saturn SAN/NAS servers with Io expansion pods.' },
+  { icon: MonitorDot, label: 'Workstations', desc: 'Neptune & Mars desktops for the reading room.' },
+  { icon: Activity, label: 'Edge & IoMT', desc: 'Pluto gateways connecting devices at the modality.' },
+]
 
 /* ------------------------------------------------------------------ */
 /* Product spotlight orbit                                             */
@@ -22,7 +30,13 @@ const FEATURED_ORBITS = [
   { slug: 'neptune', radius: 24 },
   { slug: 'mars', radius: 41 },
   { slug: 'pluto', radius: 32 },
-].map((o) => ({ ...o, name: products.find((p) => p.slug === o.slug)?.name ?? o.slug }))
+].map((o) => {
+  const p = products.find((p) => p.slug === o.slug)
+  const tagline = p?.tagline ?? ''
+  // Long taglines get cut at a word boundary so the label stays inside the tile.
+  const sub = (tagline.length > 26 ? `${tagline.slice(0, 26).replace(/\s+\S*$/, '')}…` : tagline).toUpperCase()
+  return { ...o, name: p?.name ?? o.slug, sub }
+})
 
 const ORBIT_CX = 1
 const ORBIT_CY = 67
@@ -82,11 +96,15 @@ function ProductOrbit({ reduceMotion }) {
         if (env <= 0.01) return
 
         // Label anchored radially outward from the ball, clamped into view
-        const halfW = orbit.name.length * 0.93
+        const halfW = Math.max(orbit.name.length * 0.93, orbit.sub.length * 0.77)
         const lx = clamp(ORBIT_CX + (orbit.radius + 10) * Math.sin(rad), halfW + 6, 51 - halfW)
         const ly = clamp(ORBIT_CY - (orbit.radius + 10) * Math.cos(rad), 14, 58)
         el.text.setAttribute('x', lx)
         el.text.setAttribute('y', ly - 2)
+        if (el.sub) {
+          el.sub.setAttribute('x', lx)
+          el.sub.setAttribute('y', ly + 0.6)
+        }
 
         // Leader arrow from the label to the rim of the zoomed ball
         const dx = x - lx
@@ -94,7 +112,7 @@ function ProductOrbit({ reduceMotion }) {
         const len = Math.hypot(dx, dy) || 1
         const rim = dotR + 1.9
         el.line.setAttribute('x1', lx)
-        el.line.setAttribute('y1', ly + 0.8)
+        el.line.setAttribute('y1', ly + (orbit.sub ? 2.1 : 0.8))
         el.line.setAttribute('x2', x - (dx / len) * rim)
         el.line.setAttribute('y2', y - (dy / len) * rim)
 
@@ -155,6 +173,21 @@ function ProductOrbit({ reduceMotion }) {
             >
               {orbit.name}
             </text>
+            {orbit.sub ? (
+              <text
+                ref={bindRef(i, 'sub')}
+                fill="rgba(255,179,186,.92)"
+                fontSize="2"
+                fontWeight="600"
+                letterSpacing=".28"
+                textAnchor="middle"
+                stroke="rgba(24,7,10,.55)"
+                strokeWidth=".45"
+                style={{ paintOrder: 'stroke' }}
+              >
+                {orbit.sub}
+              </text>
+            ) : null}
           </g>
         </g>
       ))}
@@ -313,11 +346,11 @@ export default function WelcomeDialog() {
         aria-modal="true"
         aria-labelledby="welcome-title"
         aria-describedby="welcome-desc"
-        className="glass relative grid w-full max-w-5xl overflow-hidden shadow-card ring-1 ring-inset ring-white/5 animate-in fade-in zoom-in-95 slide-in-from-bottom-4 duration-500 md:min-h-[440px] md:grid-cols-[minmax(0,380px),1fr]"
+        className="glass relative grid w-full max-w-6xl overflow-hidden shadow-card ring-1 ring-inset ring-white/5 animate-in fade-in zoom-in-95 slide-in-from-bottom-4 duration-500 md:min-h-[560px] md:grid-cols-[minmax(0,440px),1fr]"
       >
         {/* Visual panel — the big atom, full bleed */}
         <div className="relative h-44 overflow-hidden bg-gradient-to-br from-ink-700 to-ink-800 md:h-auto md:border-r md:border-white/5">
-          <AtomFan className="pointer-events-none absolute -bottom-10 -left-10 h-[420px] w-[420px] [filter:drop-shadow(0_0_10px_rgba(255,77,94,.45))] md:h-[560px] md:w-[560px]" />
+          <AtomFan className="pointer-events-none absolute -bottom-10 -left-10 h-[420px] w-[420px] [filter:drop-shadow(0_0_10px_rgba(255,77,94,.45))] md:h-[660px] md:w-[660px]" />
           {/* Corner glow anchoring the fan */}
           <div
             aria-hidden
@@ -344,14 +377,20 @@ export default function WelcomeDialog() {
               Hardware engineered for <span className="text-grad">medical imaging</span>
             </h2>
 
-            <div className="mt-6 flex flex-wrap gap-2">
-              {['Compute', 'Storage', 'Workstations', 'Edge & IoMT'].map((chip) => (
-                <span
-                  key={chip}
-                  className="rounded-full border border-beam/25 bg-beam/[.07] px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-foreground/80"
+            <div className="mt-8 grid gap-3 sm:grid-cols-2">
+              {CATEGORIES.map(({ icon: Icon, label, desc }) => (
+                <div
+                  key={label}
+                  className="flex items-start gap-3.5 rounded-2xl border border-white/[.07] bg-white/[.03] p-4"
                 >
-                  {chip}
-                </span>
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-beam/25 bg-beam/[.08]">
+                    <Icon className="h-4 w-4 text-beam" />
+                  </span>
+                  <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-widest text-foreground/90">{label}</p>
+                    <p className="mt-1 text-[12.5px] leading-relaxed text-muted-foreground">{desc}</p>
+                  </div>
+                </div>
               ))}
             </div>
           </div>
