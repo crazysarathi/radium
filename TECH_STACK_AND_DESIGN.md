@@ -2,7 +2,7 @@
 
 The reusable stack and design language used across projects. No file paths — copy
 this into a new project and install the same packages, tokens and rules.
-
+ok
 ---
 
 ## 1. Core Stack
