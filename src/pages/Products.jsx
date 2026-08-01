@@ -1,13 +1,23 @@
 import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { ArrowRight, Search } from 'lucide-react'
 import ProductCard from '@/components/ProductCard'
 import { PageHero, Breadcrumb, Section, Badge, Button } from '@/components/ui'
-import { products, categories, jupiterModels } from '@/data/products'
+import { useCatalogue } from '@/context/CatalogueContext'
 import { formatCapacity } from '@/lib/utils'
 
 export default function Products() {
-  const [cat, setCat] = useState('all')
+  const { products, categories, skuVariants, getProductById } = useCatalogue()
+  // The category filter lives in the URL (?category=storage) so the header's
+  // category links land here pre-filtered — and re-filter in place when
+  // clicked while this page is already mounted. The chips below write the
+  // same param, which keeps them, the nav and the address bar in sync.
+  // A value the API doesn't know (stale bookmark, category renamed in the
+  // admin) falls back to 'all' — never an empty grid with no active chip.
+  const [searchParams, setSearchParams] = useSearchParams()
+  const rawCat = searchParams.get('category')
+  const cat = rawCat && categories.some((c) => c.key === rawCat) ? rawCat : 'all'
+  const setCat = (key) => setSearchParams(key === 'all' ? {} : { category: key })
   const [q, setQ] = useState('')
   const [showRoadmap, setShowRoadmap] = useState(true)
 
@@ -21,7 +31,7 @@ export default function Products() {
         .filter(Boolean)
         .some((s) => s.toLowerCase().includes(needle))
     })
-  }, [cat, q, showRoadmap])
+  }, [products, cat, q, showRoadmap])
 
   return (
     <>
@@ -109,7 +119,7 @@ export default function Products() {
                 First two digits — bays. Second two — drive capacity. Last two — drives installed.
               </p>
             </div>
-            <Badge>{jupiterModels.length} SKUs</Badge>
+            <Badge>{skuVariants.length} SKUs</Badge>
           </div>
 
           <div className="overflow-x-auto">
@@ -126,7 +136,7 @@ export default function Products() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/[.05]">
-                {jupiterModels.map((m) => (
+                {skuVariants.map((m) => (
                   <tr key={m.code} className="transition-colors hover:bg-beam/[.06]">
                     <th scope="row" className="px-6 py-3.5 font-mono text-[13.5px] font-semibold text-foreground">
                       {m.name}
@@ -141,7 +151,7 @@ export default function Products() {
                     <td className="px-6 py-3.5 text-muted-foreground">{m.rackUnits}</td>
                     <td className="px-6 py-3.5 text-right">
                       <Link
-                        to={`/products/jupiter/${m.code}`}
+                        to={`/products/${getProductById(m.family)?.slug ?? 'jupiter'}/${m.code}`}
                         className="inline-flex items-center gap-1 text-[13px] font-semibold text-beam hover:underline"
                       >
                         Details <ArrowRight className="h-3.5 w-3.5" />

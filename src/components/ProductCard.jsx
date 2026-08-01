@@ -3,7 +3,7 @@ import { ArrowRight, GitCompare, Check } from 'lucide-react'
 import { ProductImage } from './ProductGallery'
 import { Tilt } from './ui'
 import { useCompare } from './compare/CompareContext'
-import { cardBullets } from '@/data/products'
+import { cardBullets } from '@/lib/catalogue'
 import { cn } from '@/lib/utils'
 
 /**

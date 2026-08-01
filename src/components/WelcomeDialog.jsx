@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Activity, ArrowRight, Cpu, HardDrive, MonitorDot } from 'lucide-react'
 import { Button } from './ui'
-import { products } from '../data/products'
+import { useCatalogue } from '@/context/CatalogueContext'
 
 const STORAGE_KEY = 'radium:welcome-seen'
 
@@ -10,19 +10,16 @@ const CATEGORIES = [
   { icon: Cpu, label: 'Compute', desc: 'Mercury high-performance computers for PACS & VNA cores.' },
   { icon: HardDrive, label: 'Storage', desc: 'Jupiter & Saturn SAN/NAS servers with Io expansion pods.' },
   { icon: MonitorDot, label: 'Workstations', desc: 'Neptune & Mars desktops for the reading room.' },
-  { icon: Activity, label: 'Edge & IoMT', desc: 'Pluto gateways connecting devices at the modality.' },
+  { icon: Activity, label: 'IoMT', desc: 'Pluto gateways connecting devices at the modality.' },
 ]
 
 /* ------------------------------------------------------------------ */
 /* Product spotlight orbit                                             */
 /* ------------------------------------------------------------------ */
 
-/**
- * One satellite ball per product family, orbiting the fan's corner on its
- * own ring. Radii alternate inner/outer so consecutive spotlights hop
- * between rings instead of marching along one arc.
- */
-const FEATURED_ORBITS = [
+/** Radii for each featured family's ring — alternating inner/outer so
+ *  consecutive spotlights hop between rings instead of marching along one arc. */
+const ORBIT_RADII = [
   { slug: 'mercury', radius: 20 },
   { slug: 'jupiter', radius: 44 },
   { slug: 'io', radius: 28 },
@@ -30,17 +27,30 @@ const FEATURED_ORBITS = [
   { slug: 'neptune', radius: 24 },
   { slug: 'mars', radius: 41 },
   { slug: 'pluto', radius: 32 },
-].map((o) => {
-  const p = products.find((p) => p.slug === o.slug)
-  const tagline = p?.tagline ?? ''
-  // Long taglines get cut at a word boundary so the label stays inside the tile.
-  const sub = (tagline.length > 26 ? `${tagline.slice(0, 26).replace(/\s+\S*$/, '')}…` : tagline).toUpperCase()
-  return { ...o, name: p?.name ?? o.slug, sub }
-})
+]
+
+/**
+ * One satellite ball per product family, orbiting the fan's corner on its
+ * own ring — built from the live catalogue so taglines stay in sync with
+ * the API instead of a module-scope snapshot of the old static array.
+ */
+function useFeaturedOrbits(products) {
+  return useMemo(
+    () =>
+      ORBIT_RADII.map((o) => {
+        const p = products.find((p) => p.slug === o.slug)
+        const tagline = p?.tagline ?? ''
+        // Long taglines get cut at a word boundary so the label stays inside the tile.
+        const sub = (tagline.length > 26 ? `${tagline.slice(0, 26).replace(/\s+\S*$/, '')}…` : tagline).toUpperCase()
+        return { ...o, name: p?.name ?? o.slug, sub }
+      }),
+    [products]
+  )
+}
 
 const ORBIT_CX = 1
 const ORBIT_CY = 67
-const ORBIT_COUNT = FEATURED_ORBITS.length
+const ORBIT_COUNT = ORBIT_RADII.length
 /** Stage wedge: exactly one satellite inside it at any moment. */
 const WEDGE = 360 / ORBIT_COUNT
 const WEDGE_START = 45 - WEDGE / 2
@@ -52,7 +62,7 @@ const STILL_SLOT = 4
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v))
 const smoothstep = (v) => v * v * (3 - 2 * v)
 
-function ProductOrbit({ reduceMotion }) {
+function ProductOrbit({ orbits, reduceMotion }) {
   const itemsRef = useRef([])
   const startRef = useRef(null)
 
@@ -63,7 +73,7 @@ function ProductOrbit({ reduceMotion }) {
       const t = (now - startRef.current) / 1000
       const stillIndex = Math.floor(t / STILL_SLOT) % ORBIT_COUNT
 
-      FEATURED_ORBITS.forEach((orbit, i) => {
+      orbits.forEach((orbit, i) => {
         const el = itemsRef.current[i]
         if (!el?.sat) return
 
@@ -125,7 +135,9 @@ function ProductOrbit({ reduceMotion }) {
     }
     raf = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(raf)
-  }, [reduceMotion])
+    // Restart (re-close over fresh names/taglines) whenever the catalogue
+    // resolves — orbits starts as slug-only fallbacks before the fetch lands.
+  }, [orbits, reduceMotion])
 
   const bindRef = (i, key) => (node) => {
     ;(itemsRef.current[i] ??= {})[key] = node
@@ -145,7 +157,7 @@ function ProductOrbit({ reduceMotion }) {
           <path d="M0 0 L6 3 L0 6 z" fill="#ff97a1" />
         </marker>
       </defs>
-      {FEATURED_ORBITS.map((orbit, i) => (
+      {orbits.map((orbit, i) => (
         <g key={orbit.slug}>
           <circle ref={bindRef(i, 'sat')} r="1.3" fill="#ffb3ba" />
           <g ref={bindRef(i, 'callout')} opacity="0">
@@ -201,7 +213,7 @@ function ProductOrbit({ reduceMotion }) {
  * Same geometry and ring timings as /favicon.svg, radiating from the
  * bottom-left corner (arc centre 1,67 in the 70-unit tile).
  */
-function AtomFan({ className }) {
+function AtomFan({ className, orbits }) {
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
   const spin = (dur) =>
@@ -295,12 +307,14 @@ function AtomFan({ className }) {
       </g>
 
       {/* Product spotlight — one ball at a time zooms with an arrow + name */}
-      <ProductOrbit reduceMotion={reduceMotion} />
+      <ProductOrbit orbits={orbits} reduceMotion={reduceMotion} />
     </svg>
   )
 }
 
 export default function WelcomeDialog() {
+  const catalogue = useCatalogue()
+  const orbits = useFeaturedOrbits(catalogue?.products ?? [])
   const [open, setOpen] = useState(false)
   const okRef = useRef(null)
 
@@ -350,7 +364,10 @@ export default function WelcomeDialog() {
       >
         {/* Visual panel — the big atom, full bleed */}
         <div className="relative h-44 overflow-hidden bg-gradient-to-br from-ink-700 to-ink-800 md:h-auto md:border-r md:border-white/5">
-          <AtomFan className="pointer-events-none absolute -bottom-10 -left-10 h-[420px] w-[420px] [filter:drop-shadow(0_0_10px_rgba(255,77,94,.45))] md:h-[660px] md:w-[660px]" />
+          <AtomFan
+            orbits={orbits}
+            className="pointer-events-none absolute -bottom-10 -left-10 h-[420px] w-[420px] [filter:drop-shadow(0_0_10px_rgba(255,77,94,.45))] md:h-[660px] md:w-[660px]"
+          />
           {/* Corner glow anchoring the fan */}
           <div
             aria-hidden

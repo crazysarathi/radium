@@ -1,22 +1,31 @@
 import { Navigate, Link, useParams } from 'react-router-dom'
-import { ArrowRight, ArrowLeft, FileText, ShoppingCart } from 'lucide-react'
+import { ArrowRight, ArrowLeft, ShoppingCart } from 'lucide-react'
 import ProductGallery from '@/components/ProductGallery'
 import { PageHero, Breadcrumb, Section, SpecTable, Badge, Button, DraftNotice, SplitText } from '@/components/ui'
 import { useEnquiry } from '@/components/enquiry/EnquiryContext'
-import { getModel, getProduct, jupiterModels, commonSpecs } from '@/data/products'
+import { useCatalogue } from '@/context/CatalogueContext'
+import { commonSpecs } from '@/lib/catalogue'
 import { formatCapacity } from '@/lib/utils'
 
 export default function ModelDetail() {
-  const { code } = useParams()
+  const { slug, code } = useParams()
   const enquiry = useEnquiry()
-  const model = getModel(code)
-  if (!model) return <Navigate to="/products/jupiter" replace />
+  const { getVariantByCode, getProductById, skuVariants } = useCatalogue()
+  const model = getVariantByCode(code)
+  if (!model) return <Navigate to={slug ? `/products/${slug}` : '/products'} replace />
 
-  const family = getProduct('jupiter')
+  // model.family is the parent product's immutable id (not its renameable
+  // slug) — look it up by id so a slug rename in the admin can't break this
+  // page, and guard the miss instead of letting `family.specs` throw below.
+  const family = getProductById(model.family)
+  if (!family) return <Navigate to="/products" replace />
+
   const maxRaw = model.bays * model.driveCapacityTb
   const fillPct = Math.round((model.drivesInstalled / model.bays) * 100)
 
-  const siblings = jupiterModels.filter((m) => m.bays === model.bays && m.code !== model.code)
+  const siblings = skuVariants.filter(
+    (m) => m.family === model.family && m.bays === model.bays && m.code !== model.code
+  )
 
   const configSpecs = [
     {
@@ -51,14 +60,14 @@ export default function ModelDetail() {
             trail={[
               { label: 'Home', to: '/' },
               { label: 'Products', to: '/products' },
-              { label: 'Jupiter', to: '/products/jupiter' },
+              { label: family.name, to: `/products/${family.slug}` },
               { label: model.name },
             ]}
           />
         }
-        eyebrow="Storage Server · SAN / NAS"
+        eyebrow={family.tagline}
         title={model.name}
-        body={`A ${model.rackUnits} Jupiter storage server with ${model.bays} bays, shipping with ${model.drivesInstalled} × ${model.driveCapacityTb} TB drives installed — ${formatCapacity(model.rawCapacityTb)} raw, with ${model.baysFree} bays left for expansion.`}
+        body={`A ${model.rackUnits} ${family.name} with ${model.bays} bays, shipping with ${model.drivesInstalled} × ${model.driveCapacityTb} TB drives installed — ${formatCapacity(model.rawCapacityTb)} raw, with ${model.baysFree} bays left for expansion.`}
       >
         <div className="mt-8 flex flex-wrap gap-3">
           <Button to="/contact" size="lg">
@@ -74,15 +83,15 @@ export default function ModelDetail() {
                 id: `model:${model.code}`,
                 name: model.name,
                 meta: `${model.bays}-bay · ${formatCapacity(model.rawCapacityTb)} raw`,
-                family: 'jupiter',
+                family: family.slug,
               })
               enquiry?.openDrawer()
             }}
           >
             <ShoppingCart className="h-4 w-4" /> Add to enquiry
           </Button>
-          <Button to="/products/jupiter#models" variant="outline" size="lg">
-            <ArrowLeft className="h-4 w-4" /> All Jupiter models
+          <Button to={`/products/${family.slug}#models`} variant="outline" size="lg">
+            <ArrowLeft className="h-4 w-4" /> All {family.name} models
           </Button>
         </div>
       </PageHero>
@@ -154,8 +163,8 @@ export default function ModelDetail() {
         </div>
         <div className="reveal mt-5">
           <DraftNotice>
-            Chassis-level values are inherited from the Jupiter family record. Per-SKU
-            overrides can be added in <span className="font-mono text-foreground/80">src/data/products.js</span>.
+            Chassis-level values are inherited from the {family.name} family record. Per-SKU
+            overrides can be added via the admin console.
           </DraftNotice>
         </div>
       </Section>
@@ -165,7 +174,7 @@ export default function ModelDetail() {
           <h2 className="t-h3 reveal text-foreground">Other {model.bays}-bay configurations</h2>
           <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {siblings.map((s) => (
-              <Link key={s.code} to={`/products/jupiter/${s.code}`} className="reveal glass glass-hover group p-5">
+              <Link key={s.code} to={`/products/${family.slug}/${s.code}`} className="reveal glass glass-hover group p-5">
                 <p className="font-mono text-[15px] font-bold text-foreground group-hover:text-beam">{s.code}</p>
                 <p className="mt-1.5 text-[12.5px] text-muted-foreground">
                   {s.driveCapacityTb} TB × {s.drivesInstalled}
@@ -188,9 +197,6 @@ export default function ModelDetail() {
           </div>
           <div className="flex shrink-0 gap-3">
             <Button to="/contact" size="lg">Request a quote</Button>
-            <Button to="/resources" variant="outline" size="lg">
-              <FileText className="h-4 w-4" /> Datasheet
-            </Button>
           </div>
         </div>
       </Section>

@@ -3,8 +3,8 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react'
 import { ProductImage } from '@/components/ProductGallery'
 import { Badge, Button, Magnetic } from '@/components/ui'
-import { getProduct } from '@/data/products'
-import { imagesFor } from '@/data/productImages'
+import { useCatalogue } from '@/context/CatalogueContext'
+import { imagesFor } from '@/lib/catalogue'
 import { THEMES, useThemeZone } from '@/components/ThemeField'
 
 const AUTOPLAY_MS = 9000
@@ -49,14 +49,14 @@ const SLIDES = [
     chips: ['Model number = spec sheet', 'Bay-level scaling', 'One firmware baseline'],
   },
   {
-    key: 'solutions',
+    key: 'system',
     theme: 'crimson',
-    eyebrow: 'Solutions',
+    eyebrow: 'IoMT',
     title: 'From modality to reading room, one vendor on the hook.',
     body:
       'IoMT gateways at the modality, the archive in the rack, workstations in the reading room — specified as one system, quoted as one path, backed by one support number.',
     ctas: [
-      { label: 'Explore solutions', to: '/solutions' },
+      { label: 'Explore the product line', to: '/products' },
       { label: 'Request a quote', to: '/contact', outline: true },
     ],
     product: 'mercury',
@@ -64,11 +64,29 @@ const SLIDES = [
     status: 'Configure to order',
     chips: ['PACS / VNA / AI', 'Edge to core', 'One support number'],
   },
+  {
+    key: 'reading-room',
+    theme: 'crimson',
+    eyebrow: 'Reading Room Workstations',
+    title: 'The last three feet of the archive is a desk.',
+    body:
+      'Neptune diagnostic desktops drive paired greyscale heads with GPU room to spare for 3D and MPR — quiet enough for the reading room, quoted alongside the rack they read from.',
+    ctas: [
+      { label: 'Reading workstations', to: '/products/neptune' },
+      { label: 'Request a quote', to: '/contact', outline: true },
+    ],
+    product: 'neptune',
+    caption: 'Radium Neptune — diagnostic reading and reporting desktop',
+    status: 'Configure to order',
+    chips: ['Multi-head displays', 'Reading-room quiet', '3D / MPR headroom'],
+  },
 ]
 
 const pad = (n) => String(n + 1).padStart(2, '0')
 
 export default function HeroSlider() {
+  const catalogue = useCatalogue()
+  const getProduct = catalogue?.getProduct ?? (() => undefined)
   const reduce = useReducedMotion()
   const [active, setActive] = useState(0)
   // Bumped on every manual jump so the autoplay timer and the progress bar
@@ -91,7 +109,8 @@ export default function HeroSlider() {
   }, [active, cycle, reduce])
 
   // Warm the cache for every slide's cover shot so the first rotation never
-  // shows an empty panel while an image streams in.
+  // shows an empty panel while an image streams in. Re-runs once the
+  // catalogue lands (products are empty on the very first paint).
   useEffect(() => {
     SLIDES.forEach((s) => {
       const src = imagesFor(getProduct(s.product))[0]?.src
@@ -100,7 +119,8 @@ export default function HeroSlider() {
         img.src = src
       }
     })
-  }, [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [catalogue?.products])
 
   const fadeText = reduce
     ? {}

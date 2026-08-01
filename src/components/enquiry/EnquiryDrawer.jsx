@@ -2,7 +2,8 @@ import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Minus, Plus, ShoppingCart, ArrowRight, Trash2 } from 'lucide-react'
-import { accessoriesFor, useEnquiry } from './EnquiryContext'
+import { useEnquiry } from './EnquiryContext'
+import { useCatalogue } from '@/context/CatalogueContext'
 
 /**
  * Slide-over enquiry tray. Opens from the cart button in the header; quantities
@@ -11,6 +12,7 @@ import { accessoriesFor, useEnquiry } from './EnquiryContext'
  */
 export default function EnquiryDrawer() {
   const enquiry = useEnquiry()
+  const catalogue = useCatalogue()
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -34,7 +36,7 @@ export default function EnquiryDrawer() {
   // ones the list already holds — added ones move up into the items above.
   const families = [...new Set(enquiry.items.map((i) => i.family).filter(Boolean))]
   const suggested = families
-    .flatMap((f) => accessoriesFor(f))
+    .flatMap((f) => catalogue?.accessoriesFor(f) ?? [])
     .filter((a, idx, arr) => arr.findIndex((x) => x.id === a.id) === idx)
     .filter((a) => !enquiry.has(`acc:${a.id}`))
 

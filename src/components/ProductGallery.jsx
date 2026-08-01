@@ -1,9 +1,9 @@
 /**
- * Product media — catalogue photography served locally from `public/products/`.
- *
- * Every family's shots are declared in `src/data/productImages.js`; the first
- * entry is the card/cover shot. A family with no entry shows a reserved empty
- * panel until photography is added — no probing, no generated artwork.
+ * Product media — catalogue photography served from the API's `images` field
+ * (root-relative paths resolve against `public/products/`; admin-uploaded
+ * ones are absolute URLs on the backend host). The first entry is the
+ * card/cover shot. A family with no images shows a reserved empty panel —
+ * no probing, no generated artwork.
  *
  *   ProductImage   — cover shot (cards, listings, hero, compare)
  *   ProductGallery — AIC-style viewer: vertical thumbnail rail + arrows,
@@ -12,7 +12,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { ChevronUp, ChevronDown, ChevronLeft, ChevronRight, ImageOff, Maximize2, X } from 'lucide-react'
-import { imagesFor } from '@/data/productImages'
+import { imagesFor } from '@/lib/catalogue'
 import { cn } from '@/lib/utils'
 
 /* ------------------------------------------------------------------ */
@@ -37,8 +37,7 @@ export function ProductImage({ product, className }) {
 
   // White studio panel; the photo paints progressively as it streams in.
   return (
-    // <div className={cn('overflow-hidden bg-white', className)}>
-     <div className={cn('overflow-hidden bg-whites', className)}>
+    <div className={cn('overflow-hidden bg-white', className)}>
       <img
         src={src}
         alt={product?.name ?? 'Radium hardware'}

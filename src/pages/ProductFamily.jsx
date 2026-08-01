@@ -1,25 +1,30 @@
 import { useState } from 'react'
 import { Navigate, Link, useParams } from 'react-router-dom'
-import { ArrowRight, Download, FileText, CheckCircle2, ShoppingCart } from 'lucide-react'
+import { ArrowRight, CheckCircle2, ShoppingCart } from 'lucide-react'
 import ProductGallery, { ProductImage } from '@/components/ProductGallery'
 import {
   PageHero, Breadcrumb, Section, SectionHead, SpecTable, Badge, Button, DraftNotice, SplitText,
 } from '@/components/ui'
-import { getProduct, getFullSpecs, products } from '@/data/products'
-import { chassisModelsFor, chassisRackUnits } from '@/data/chassis'
+import { getFullSpecs } from '@/lib/catalogue'
+import { useCatalogue } from '@/context/CatalogueContext'
 import { useEnquiry } from '@/components/enquiry/EnquiryContext'
+import { formatCapacity } from '@/lib/utils'
 
 /**
- * AIC-style model line-up for the chassis families: photo panel, model number,
- * dash-bullet specs and a quote action per model — filterable by rack unit.
+ * AIC-style model line-up, one grid for every family: variants with a
+ * decodable SKU code render as decoded capacity cards linking to their detail
+ * page; named models render as photo cards with dash-bullet specs and a quote
+ * action — filterable by rack unit either way.
  */
-function ChassisModels({ product }) {
-  const models = chassisModelsFor(product.slug)
-  const units = chassisRackUnits(product.slug)
+function VariantModels({ product }) {
+  const { variantsFor, rackUnitsFor } = useCatalogue()
+  // Variants key off the product's immutable id, not its (renameable) slug.
+  const models = variantsFor(product.id)
+  const units = rackUnitsFor(product.id)
   const [ru, setRu] = useState('all')
   if (models.length === 0) return null
 
-  const shown = ru === 'all' ? models : models.filter((m) => m.ru === ru)
+  const shown = ru === 'all' ? models : models.filter((m) => m.rackUnits === ru)
 
   return (
     <Section id="models" tight>
@@ -51,46 +56,76 @@ function ChassisModels({ product }) {
       </div>
 
       <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {shown.map((m) => (
-          <div
-            key={m.id}
-            id={m.id}
-            className="reveal group flex h-full flex-col overflow-hidden rounded-glass border border-white/[.08] bg-[rgba(30,12,14,.55)] backdrop-blur-[12px] transition-[border-color,box-shadow] duration-300 hover:border-beam/40 hover:shadow-[0_0_38px_-8px_rgba(255,77,94,.35)]"
-          >
-            <div className="border-b border-white/[.06] bg-white p-5">
-              <img
-                src={m.img}
-                alt={`${m.model} — front view`}
-                loading="lazy"
-                className="aspect-[360/236] w-full object-contain transition-transform duration-500 group-hover:scale-[1.03]"
-              />
-            </div>
-            <div className="flex flex-1 flex-col p-6">
+        {shown.map((m) =>
+          m.code ? (
+            <Link
+              key={m.id}
+              id={m.id}
+              to={`/products/${product.slug}/${m.code}`}
+              className="reveal glass glass-hover group flex h-full flex-col p-6"
+            >
               <div className="flex items-start justify-between gap-3">
                 <h3 className="font-mono text-[17px] font-bold text-foreground transition-colors group-hover:text-beam">
-                  {m.model}
+                  {m.code}
                 </h3>
-                <Badge tone="muted">{m.ru}</Badge>
+                <Badge tone="muted">{m.rackUnits}</Badge>
               </div>
-              <ul className="mt-4 flex-1 space-y-1.5">
-                {m.bullets.map((b) => (
-                  <li key={b} className="flex gap-2 text-[13px] leading-snug text-muted-foreground">
-                    <span className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-beam/70" />
-                    <span>{b}</span>
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-5 border-t border-white/[.06] pt-4">
-                <Link
-                  to="/contact"
-                  className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-beam/40 bg-beam/10 px-3 py-2 text-[12.5px] font-semibold text-beam transition-colors hover:bg-beam/20"
-                >
-                  Request a Quote
-                </Link>
+              <p className="mt-1.5 text-[12.5px] text-muted-foreground">{m.name}</p>
+              {m.bays != null && (
+                <>
+                  <p className="mt-4 flex-1 text-[13px] leading-snug text-muted-foreground">
+                    {m.bays} bays · {m.driveCapacityTb} TB drives · {m.drivesInstalled} installed
+                  </p>
+                  <p className="mt-3 text-[14px] font-semibold text-beam">
+                    {formatCapacity(m.rawCapacityTb)} raw
+                  </p>
+                </>
+              )}
+              <div className="mt-5 border-t border-white/[.06] pt-4 text-[12.5px] font-semibold text-beam">
+                View model <ArrowRight className="ml-1 inline h-3.5 w-3.5" />
+              </div>
+            </Link>
+          ) : (
+            <div
+              key={m.id}
+              id={m.id}
+              className="reveal group flex h-full flex-col overflow-hidden rounded-glass border border-white/[.08] bg-[rgba(30,12,14,.55)] backdrop-blur-[12px] transition-[border-color,box-shadow] duration-300 hover:border-beam/40 hover:shadow-[0_0_38px_-8px_rgba(255,77,94,.35)]"
+            >
+              <div className="border-b border-white/[.06] bg-white p-5">
+                <img
+                  src={m.img}
+                  alt={`${m.name} — front view`}
+                  loading="lazy"
+                  className="aspect-[360/236] w-full object-contain transition-transform duration-500 group-hover:scale-[1.03]"
+                />
+              </div>
+              <div className="flex flex-1 flex-col p-6">
+                <div className="flex items-start justify-between gap-3">
+                  <h3 className="font-mono text-[17px] font-bold text-foreground transition-colors group-hover:text-beam">
+                    {m.name}
+                  </h3>
+                  <Badge tone="muted">{m.rackUnits}</Badge>
+                </div>
+                <ul className="mt-4 flex-1 space-y-1.5">
+                  {m.bullets.map((b) => (
+                    <li key={b} className="flex gap-2 text-[13px] leading-snug text-muted-foreground">
+                      <span className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-beam/70" />
+                      <span>{b}</span>
+                    </li>
+                  ))}
+                </ul>
+                <div className="mt-5 border-t border-white/[.06] pt-4">
+                  <Link
+                    to="/contact"
+                    className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-beam/40 bg-beam/10 px-3 py-2 text-[12.5px] font-semibold text-beam transition-colors hover:bg-beam/20"
+                  >
+                    Request a Quote
+                  </Link>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          )
+        )}
       </div>
 
       {shown.length === 0 && (
@@ -103,6 +138,7 @@ function ChassisModels({ product }) {
 export default function ProductFamily() {
   const { slug } = useParams()
   const enquiry = useEnquiry()
+  const { getProduct, products } = useCatalogue()
   const product = getProduct(slug)
   if (!product) return <Navigate to="/products" replace />
 
@@ -150,9 +186,6 @@ export default function ProductFamily() {
               View model numbers
             </Button>
           )}
-          <Button to="/resources" variant="outline" size="lg">
-            <FileText className="h-4 w-4" /> Datasheet
-          </Button>
         </div>
       </PageHero>
 
@@ -192,8 +225,8 @@ export default function ProductFamily() {
         )}
       </Section>
 
-      {/* Chassis model line-up (AIC-style catalogue grid) */}
-      <ChassisModels product={product} />
+      {/* Variant model line-up (AIC-style catalogue grid) */}
+      <VariantModels product={product} />
 
       {/* Specs */}
       {fullSpecs.length > 0 && (
@@ -205,7 +238,7 @@ export default function ProductFamily() {
           <div className="reveal mt-5">
             <DraftNotice>
               Specification values are indicative pending the approved datasheet. Update
-              them in <span className="font-mono text-foreground/80">src/data/products.js</span>.
+              them via the admin console.
             </DraftNotice>
           </div>
         </Section>
@@ -220,9 +253,6 @@ export default function ProductFamily() {
               <p className="mt-3 text-[13.5px] leading-relaxed text-muted-foreground">
                 Where {product.name} sits in a Radium imaging stack.
               </p>
-              <Button to="/solutions" variant="outline" size="sm" className="mt-6">
-                See full solutions
-              </Button>
             </div>
             <ul className="grid gap-3 sm:grid-cols-2">
               {product.applications.map((a) => (
@@ -236,40 +266,19 @@ export default function ProductFamily() {
         </Section>
       )}
 
-      {/* Downloads + related */}
+      {/* Related products */}
       <Section tight>
-        <div className="grid gap-5 lg:grid-cols-[1fr_1.4fr]">
-          <div className="reveal glass p-6">
-            <h3 className="t-eyebrow text-beam/70">Downloads</h3>
-            <ul className="mt-4 space-y-1">
-              {[`${product.name} datasheet`, `${product.name} installation guide`, 'Warranty & support terms'].map((d) => (
-                <li key={d}>
-                  <Link
-                    to="/resources"
-                    className="group flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-[13.5px] text-muted-foreground transition-colors hover:bg-beam/10 hover:text-foreground"
-                  >
-                    {d}
-                    <Download className="h-3.5 w-3.5 shrink-0 text-beam/60 group-hover:text-beam" />
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="t-eyebrow reveal mb-4 text-beam/70">Related products</h3>
-            <div className="grid gap-4 sm:grid-cols-3">
-              {related.map((p) => (
-                <Link key={p.slug} to={`/products/${p.slug}`} className="reveal glass glass-hover group overflow-hidden">
-                  <ProductImage product={p} className="aspect-[360/236] w-full" />
-                  <div className="p-5 pt-4">
-                    <p className="text-[15px] font-bold text-foreground group-hover:text-beam">{p.name}</p>
-                    <p className="mt-1.5 text-[12.5px] text-muted-foreground">{p.tagline}</p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
+        <h3 className="t-eyebrow reveal mb-4 text-beam/70">Related products</h3>
+        <div className="grid gap-4 sm:grid-cols-3">
+          {related.map((p) => (
+            <Link key={p.slug} to={`/products/${p.slug}`} className="reveal glass glass-hover group overflow-hidden">
+              <ProductImage product={p} className="aspect-[360/236] w-full" />
+              <div className="p-5 pt-4">
+                <p className="text-[15px] font-bold text-foreground group-hover:text-beam">{p.name}</p>
+                <p className="mt-1.5 text-[12.5px] text-muted-foreground">{p.tagline}</p>
+              </div>
+            </Link>
+          ))}
         </div>
       </Section>
     </>

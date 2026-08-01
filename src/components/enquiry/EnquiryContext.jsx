@@ -1,5 +1,4 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import accessoriesData from '@/data/accessories.json'
 
 /**
  * Enquiry list — a cart-style tray for products, models and their accessories.
@@ -8,13 +7,14 @@ import accessoriesData from '@/data/accessories.json'
  *
  * Item shape: { id, name, meta, qty } where `id` is namespaced, e.g.
  * `product:jupiter`, `model:242016`, `acc:rail-kit-28`.
+ *
+ * Accessories now live in the catalogue API — `EnquiryProvider` nests
+ * inside `CatalogueProvider` (see App.jsx) so `EnquiryDrawer` can read
+ * `accessoriesFor` straight from `useCatalogue()` instead of a module-scope
+ * JSON import.
  */
 const EnquiryContext = createContext(null)
 const STORAGE_KEY = 'radium-enquiry'
-
-/** Accessories used with a product family, straight from the JSON catalogue. */
-export const accessoriesFor = (slug) =>
-  accessoriesData.accessories.filter((a) => a.for.includes(slug))
 
 const load = () => {
   try {

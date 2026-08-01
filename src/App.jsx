@@ -4,6 +4,8 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import BackToTop from '@/components/BackToTop'
 import WelcomeDialog from '@/components/WelcomeDialog'
+import CatalogueGate from '@/components/CatalogueGate'
+import { CatalogueProvider } from '@/context/CatalogueContext'
 import { CompareProvider } from '@/components/compare/CompareContext'
 import CompareBar from '@/components/compare/CompareBar'
 import { EnquiryProvider } from '@/components/enquiry/EnquiryContext'
@@ -16,8 +18,6 @@ import Home from '@/pages/Home'
 const Products = lazy(() => import('@/pages/Products'))
 const ProductFamily = lazy(() => import('@/pages/ProductFamily'))
 const ModelDetail = lazy(() => import('@/pages/ModelDetail'))
-const Solutions = lazy(() => import('@/pages/Solutions'))
-const Resources = lazy(() => import('@/pages/Resources'))
 const Company = lazy(() => import('@/pages/Company'))
 const Contact = lazy(() => import('@/pages/Contact'))
 const NotFound = lazy(() => import('@/pages/NotFound'))
@@ -32,33 +32,35 @@ function RouteFallback() {
 
 export default function App() {
   return (
-    <CompareProvider>
-      <EnquiryProvider>
-      <SmoothScroll />
-      <ScrollManager />
-      <RevealObserver />
-      <Header />
-      <main id="main">
-        <Suspense fallback={<RouteFallback />}>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/products" element={<Products />} />
-            <Route path="/products/:slug" element={<ProductFamily />} />
-            <Route path="/products/jupiter/:code" element={<ModelDetail />} />
-            <Route path="/solutions" element={<Solutions />} />
-            <Route path="/resources" element={<Resources />} />
-            <Route path="/company" element={<Company />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
-      </main>
-      <Footer />
-      <BackToTop />
-      <CompareBar />
-      <EnquiryDrawer />
-      <WelcomeDialog />
-      </EnquiryProvider>
-    </CompareProvider>
+    <CatalogueProvider>
+      <CompareProvider>
+        <EnquiryProvider>
+          <SmoothScroll />
+          <ScrollManager />
+          <RevealObserver />
+          <Header />
+          <main id="main">
+            <CatalogueGate>
+              <Suspense fallback={<RouteFallback />}>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/products" element={<Products />} />
+                  <Route path="/products/:slug" element={<ProductFamily />} />
+                  <Route path="/products/:slug/:code" element={<ModelDetail />} />
+                  <Route path="/company" element={<Company />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Suspense>
+            </CatalogueGate>
+          </main>
+          <Footer />
+          <BackToTop />
+          <CompareBar />
+          <EnquiryDrawer />
+          <WelcomeDialog />
+        </EnquiryProvider>
+      </CompareProvider>
+    </CatalogueProvider>
   )
 }

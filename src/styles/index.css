@@ -186,6 +186,20 @@
   }
 }
 
+/* Header dropdown items — staggered entrance (delay set inline per item).
+   A keyframe animation rather than a transition so the per-item delay never
+   postpones the row's hover background-color transition. */
+@keyframes nav-item-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* Hero slider autoplay progress — restarted by re-keying the fill span */
 @keyframes hero-progress {
   from {

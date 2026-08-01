@@ -1,17 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowRight, Search, X } from 'lucide-react'
-import { products, jupiterModels, categoryLabel } from '@/data/products'
-import { chassisModels } from '@/data/chassis'
-import { productImages } from '@/data/productImages'
+import { useCatalogue } from '@/context/CatalogueContext'
+import { imagesFor } from '@/lib/catalogue'
 import { cn } from '@/lib/utils'
 
 /* ------------------------------------------------------------------ */
-/* Search index — built once from the same catalogue data that renders */
-/* the product pages, so results can never point at a missing page.    */
+/* Search index — built from the live catalogue that renders the       */
+/* product pages, so results can never point at a missing page.        */
 /* ------------------------------------------------------------------ */
 
-const INDEX = (() => {
+/** Builds the flat search index from the fetched catalogue collections. */
+function buildIndex(products, variants, categoryLabel) {
   const entries = []
 
   for (const p of products) {
@@ -21,7 +21,7 @@ const INDEX = (() => {
       title: p.name,
       subtitle: [p.tagline, p.formFactor].filter(Boolean).join(' · '),
       to: `/products/${p.slug}`,
-      img: productImages[p.slug]?.[0]?.src ?? null,
+      img: imagesFor(p)[0]?.src ?? null,
       haystack: [p.name, p.series, p.tagline, p.note, p.formFactor, categoryLabel(p.category)]
         .filter(Boolean)
         .join(' ')
@@ -29,43 +29,47 @@ const INDEX = (() => {
     })
   }
 
-  for (const m of jupiterModels) {
-    entries.push({
-      key: m.id,
-      kind: 'Model',
-      title: m.name,
-      subtitle: `${m.rackUnits} · ${m.bays} bays · ${m.rawCapacityTb} TB raw`,
-      to: `/products/jupiter/${m.code}`,
-      img: productImages.jupiter?.[0]?.src ?? null,
-      haystack: `${m.name} ${m.code} storage server san nas jupiter ss`.toLowerCase(),
-    })
-  }
+  // Variant.family is a FK to products.id (the immutable identifier), not
+  // products.slug — look families up by id, and build any product link from
+  // the resolved product's own `slug`.
+  const byId = new Map(products.map((p) => [p.id, p]))
 
-  for (const [familySlug, models] of Object.entries(chassisModels)) {
-    const family = products.find((p) => p.slug === familySlug)
-    for (const m of models) {
+  for (const m of variants) {
+    const family = byId.get(m.family)
+    if (m.code) {
+      // Coded SKU — the decoded fields came along via augmentVariant.
       entries.push({
         key: m.id,
         kind: 'Model',
-        title: m.model,
-        subtitle: `${m.ru} · ${family?.name ?? familySlug}`,
-        to: `/products/${familySlug}#${m.id}`,
+        title: m.name,
+        subtitle: `${m.rackUnits} · ${m.bays} bays · ${m.rawCapacityTb} TB raw`,
+        to: family ? `/products/${family.slug}/${m.code}` : '/products',
+        img: imagesFor(family)[0]?.src ?? null,
+        haystack: `${m.name} ${m.code} ${family?.name ?? ''} ${family?.tagline ?? ''}`.toLowerCase(),
+      })
+    } else {
+      entries.push({
+        key: m.id,
+        kind: 'Model',
+        title: m.name,
+        subtitle: `${m.rackUnits} · ${family?.name ?? m.family}`,
+        to: family ? `/products/${family.slug}#${m.id}` : '/products',
         img: m.img,
-        haystack: `${m.model} ${m.id} ${m.ru} ${family?.name ?? ''} ${m.bullets.join(' ')}`.toLowerCase(),
+        haystack: `${m.name} ${m.id} ${m.rackUnits} ${family?.name ?? ''} ${m.bullets.join(' ')}`.toLowerCase(),
       })
     }
   }
 
   return entries
-})()
+}
 
 /** Every query token must match; rank title hits above spec-text hits. */
-function searchIndex(query) {
+function searchIndex(index, query) {
   const tokens = query.toLowerCase().split(/\s+/).filter(Boolean)
   if (tokens.length === 0) return []
 
   const scored = []
-  for (const e of INDEX) {
+  for (const e of index) {
     let score = 0
     let ok = true
     for (const t of tokens) {
@@ -101,13 +105,22 @@ function Highlight({ text, query }) {
 }
 
 export default function SearchPalette({ open, onClose }) {
+  const catalogue = useCatalogue()
   const navigate = useNavigate()
   const inputRef = useRef(null)
   const listRef = useRef(null)
   const [query, setQuery] = useState('')
   const [active, setActive] = useState(0)
 
-  const results = useMemo(() => (query.trim() ? searchIndex(query) : []), [query])
+  const index = useMemo(
+    () =>
+      catalogue
+        ? buildIndex(catalogue.products, catalogue.variants, catalogue.categoryLabel)
+        : [],
+    [catalogue]
+  )
+
+  const results = useMemo(() => (query.trim() ? searchIndex(index, query) : []), [index, query])
 
   useEffect(() => {
     if (open) {

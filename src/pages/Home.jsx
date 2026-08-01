@@ -2,15 +2,15 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   ArrowRight, Server, HardDrive, Monitor, Cpu, ShieldCheck,
-  Layers, Wrench, CheckCircle2, Box,
+  Layers, Wrench, Box,
 } from 'lucide-react'
 import ChassisArt from '@/components/ChassisArt'
 import ProductCard from '@/components/ProductCard'
 import HeroSlider from '@/components/HeroSlider'
 import { ThemeBackdrop, ThemeZone } from '@/components/ThemeField'
-import { Button, Eyebrow, Section, SectionHead, Tilt, SplitText } from '@/components/ui'
-import { products, categories, jupiterModels, decodeModelNumber } from '@/data/products'
-import { solutions } from '@/data/site'
+import { Button, Eyebrow, Section, SectionHead, SplitText } from '@/components/ui'
+import { useCatalogue } from '@/context/CatalogueContext'
+import { decodeModelNumber } from '@/lib/catalogue'
 import { formatCapacity } from '@/lib/utils'
 
 const CAT_ICON = { compute: Cpu, storage: HardDrive, chassis: Box, workstation: Monitor, edge: Server }
@@ -18,6 +18,7 @@ const CAT_ICON = { compute: Cpu, storage: HardDrive, chassis: Box, workstation: 
 /* ------------------------------------------------------------------ */
 
 function ProductLine() {
+  const { products, categories } = useCatalogue()
   const [active, setActive] = useState('all')
   const shown = active === 'all' ? products : products.filter((p) => p.category === active)
 
@@ -70,6 +71,7 @@ function ProductLine() {
 /* ------------------------------------------------------------------ */
 
 function ModelDecoder() {
+  const { skuVariants } = useCatalogue()
   const [code, setCode] = useState('242016')
   const d = decodeModelNumber(code) ?? { bays: 0, driveCapacityTb: 0, drivesInstalled: 0, rawCapacityTb: 0, baysFree: 0, valid: false }
   const legend = [
@@ -96,7 +98,7 @@ function ModelDecoder() {
                 Try a model number
               </label>
               <div className="mt-3 flex flex-wrap gap-2">
-                {jupiterModels.slice(0, 6).map((m) => (
+                {skuVariants.slice(0, 6).map((m) => (
                   <button
                     key={m.code}
                     type="button"
@@ -177,41 +179,6 @@ function ModelDecoder() {
 
 /* ------------------------------------------------------------------ */
 
-function SolutionsStrip() {
-  return (
-    <Section id="solutions">
-      <SectionHead
-        eyebrow="Solutions"
-        title="Specified as a system, not a shopping list"
-        body="Most imaging projects fail at the seams — the archive sized for last year, the reading room bottlenecked on the network. Radium quotes the whole path."
-      />
-      <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-        {solutions.map((s) => (
-          <Tilt key={s.slug} className="reveal h-full" max={6}>
-            <Link
-              to={`/solutions#${s.slug}`}
-              className="group flex h-full flex-col rounded-glass border border-beam/16 bg-[rgba(30,12,14,.6)] p-6 backdrop-blur-[12px] transition-[border-color,box-shadow] duration-300 hover:border-beam/45 hover:shadow-[0_0_34px_-8px_rgba(255,77,94,.3)]"
-            >
-              <h3 className="t-h3 text-foreground transition-colors group-hover:text-beam">{s.title}</h3>
-              <p className="mt-2.5 flex-1 text-[13.5px] leading-relaxed text-muted-foreground">{s.blurb}</p>
-              <ul className="mt-5 space-y-1.5 border-t border-white/[.06] pt-4">
-                {s.stack.map((line) => (
-                  <li key={line} className="flex items-start gap-2 text-[12.5px] text-muted-foreground/85">
-                    <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-beam/60" />
-                    {line}
-                  </li>
-                ))}
-              </ul>
-            </Link>
-          </Tilt>
-        ))}
-      </div>
-    </Section>
-  )
-}
-
-/* ------------------------------------------------------------------ */
-
 function WhyRadium() {
   const items = [
     { icon: Layers, title: 'One line, top to bottom', body: 'Gateway, archive, compute and reading endpoint from a single vendor — one firmware baseline, one support number, no finger-pointing between suppliers.' },
@@ -259,9 +226,6 @@ function ClosingCta() {
           <Button to="/contact" size="lg">
             Request a quote <ArrowRight className="h-4 w-4" />
           </Button>
-          <Button to="/resources" variant="outline" size="lg">
-            Download datasheets
-          </Button>
         </div>
       </div>
     </Section>
@@ -279,7 +243,6 @@ export default function Home() {
       <HeroSlider />
       <ThemeZone theme="crimson"><ProductLine /></ThemeZone>
       <ThemeZone theme="azure"><ModelDecoder /></ThemeZone>
-      <ThemeZone theme="violet"><SolutionsStrip /></ThemeZone>
       <ThemeZone theme="amber"><WhyRadium /></ThemeZone>
       <ThemeZone theme="crimson"><ClosingCta /></ThemeZone>
     </>

@@ -3,12 +3,14 @@ import { Link } from 'react-router-dom'
 import { X, GitCompare } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useCompare } from './CompareContext'
-import { getProduct, cardBullets, categoryLabel } from '@/data/products'
+import { useCatalogue } from '@/context/CatalogueContext'
+import { cardBullets } from '@/lib/catalogue'
 import { ProductImage } from '../ProductGallery'
 import { cn } from '@/lib/utils'
 
-/** Rows shown in the side-by-side comparison. */
-const ATTRS = [
+/** Rows shown in the side-by-side comparison. `categoryLabel` comes from the
+ *  live catalogue, so it's threaded in rather than closed over statically. */
+const attrRows = (categoryLabel) => [
   ['Series', (p) => p.series],
   ['Category', (p) => categoryLabel(p.category)],
   ['Form factor', (p) => p.formFactor],
@@ -16,7 +18,8 @@ const ATTRS = [
   ['Notes', (p) => p.note || '—'],
 ]
 
-function CompareModal({ products, onClose }) {
+function CompareModal({ products, categoryLabel, onClose }) {
+  const attrs = attrRows(categoryLabel)
   useEffect(() => {
     const onKey = (e) => e.key === 'Escape' && onClose()
     window.addEventListener('keydown', onKey)
@@ -69,7 +72,7 @@ function CompareModal({ products, onClose }) {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/[.06]">
-              {ATTRS.map(([label, get]) => (
+              {attrs.map(([label, get]) => (
                 <tr key={label}>
                   <th scope="row" className="py-3 pr-3 text-left text-[11.5px] uppercase tracking-[.1em] text-muted-foreground/85">
                     {label}
@@ -108,10 +111,11 @@ function CompareModal({ products, onClose }) {
 
 export default function CompareBar() {
   const compare = useCompare()
+  const catalogue = useCatalogue()
   const [open, setOpen] = useState(false)
-  if (!compare) return null
+  if (!compare || !catalogue) return null
 
-  const products = compare.items.map(getProduct).filter(Boolean)
+  const products = compare.items.map(catalogue.getProduct).filter(Boolean)
 
   return (
     <>
@@ -165,7 +169,9 @@ export default function CompareBar() {
         )}
       </AnimatePresence>
 
-      {open && products.length >= 2 && <CompareModal products={products} onClose={() => setOpen(false)} />}
+      {open && products.length >= 2 && (
+        <CompareModal products={products} categoryLabel={catalogue.categoryLabel} onClose={() => setOpen(false)} />
+      )}
     </>
   )
 }

@@ -6,11 +6,17 @@ model detail pages, the certified pre-owned listing and the solutions page.
 Most files were downloaded from AIC's catalogue (aicipc.com); `neptune`,
 `mars` and `pluto` have no AIC equivalent, so their shots come from Supermicro
 (SYS-751A-I tower), ASRock Industrial (NUCS BOX-155H mini PC) and Advantech
-(UNO-2271G V2 edge gateway) respectively. Source pages are listed in
-`src/data/productImages.js`, which also controls gallery order and labels.
-A family with no photos shows a reserved "Product photography to follow"
-panel on detail pages and a faint no-photo mark on cards until files are
-added here.
+(UNO-2271G V2 edge gateway) respectively.
+
+Gallery order and labels are no longer declared in this repo — the client
+fetches each product's `images: [{label, src}]` list from the catalogue API
+and renders it as-is (see `src/lib/catalogue.js`'s `imagesFor`). To add,
+reorder or relabel a family's images, edit the product in the admin console;
+point `src` at a file under this folder (root-relative, e.g.
+`/products/jupiter/front-45.jpg`) to keep serving it from here, or upload
+through the admin console to host it on the backend instead. A family with
+no images shows a reserved "Product photography to follow" panel on detail
+pages and a faint no-photo mark on cards.
 
 ## Where files go
 
@@ -31,10 +37,10 @@ public/products/jupiter/rear.jpg
 public/products/jupiter/top.jpg
 ```
 
-Files matching the view names above are discovered automatically. To control
-the order/label, or to add extra angles (e.g. `rear-45`), list them in
-`src/data/productImages.js` — declared entries come first and are deduped
-against auto-discovered files.
+There's no filesystem auto-discovery — every image a product shows must be
+listed on its `images` field in the catalogue (admin console), pointing at a
+file placed here. To add extra angles (e.g. `rear-45`), drop the file in the
+product's folder and add a matching `{label, src}` entry in the admin.
 
 ## Per-SKU photos (Jupiter models — optional)
 

@@ -1,35 +1,34 @@
 import { Link } from 'react-router-dom'
 import { Mail, Phone, MapPin, ArrowUpRight } from 'lucide-react'
-import { products } from '@/data/products'
-import { solutions } from '@/data/site'
+import { useCatalogue } from '@/context/CatalogueContext'
 
 const year = new Date().getFullYear()
 
 export default function Footer() {
+  const catalogue = useCatalogue()
+  const products = catalogue?.products ?? []
+
   const cols = [
     {
       heading: 'Products',
-      links: products
-        .filter((p) => p.status === 'available')
-        .map((p) => ({ label: p.name.replace('Radium ', ''), to: `/products/${p.slug}` })),
-    },
-    {
-      heading: 'Solutions',
-      links: solutions.map((s) => ({ label: s.title, to: `/solutions#${s.slug}` })),
+      links: [
+        { label: 'All products', to: '/products' },
+        ...products
+          .filter((p) => p.status === 'available')
+          .map((p) => ({ label: p.name.replace('Radium ', ''), to: `/products/${p.slug}` })),
+      ],
     },
     {
       heading: 'Buy',
       links: [
         { label: 'Request a quote', to: '/contact' },
         { label: 'Model number guide', to: '/products/jupiter#models' },
-        { label: 'Datasheets', to: '/resources' },
       ],
     },
     {
       heading: 'Company',
       links: [
         { label: 'About Radium', to: '/company' },
-        { label: 'Resources', to: '/resources' },
         { label: 'Contact', to: '/contact' },
       ],
     },

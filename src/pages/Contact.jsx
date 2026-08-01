@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Mail, Phone, MapPin, Send, CheckCircle2, ShoppingCart } from 'lucide-react'
 import { PageHero, Breadcrumb, Section, Button, DraftNotice } from '@/components/ui'
 import { useEnquiry, enquiryAsText } from '@/components/enquiry/EnquiryContext'
-import { products } from '@/data/products'
+import { useCatalogue } from '@/context/CatalogueContext'
 
 const inputCls =
   'w-full rounded-xl border border-white/10 bg-[#1a0709]/60 px-4 py-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/60 focus:border-beam/60 focus:ring-2 focus:ring-beam/20'
@@ -10,6 +10,7 @@ const inputCls =
 export default function Contact() {
   const [sent, setSent] = useState(false)
   const enquiry = useEnquiry()
+  const { products } = useCatalogue()
   const enquiryItems = enquiry?.items ?? []
   const prefill = enquiryItems.length > 0 ? `Enquiry list:\n${enquiryAsText(enquiryItems)}\n\nProject details: ` : ''
 
