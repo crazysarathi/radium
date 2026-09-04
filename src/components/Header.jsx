@@ -160,7 +160,6 @@ export default function Header() {
                   <Link
                     to={item.to}
                     aria-current={activeCategory === item.category ? 'page' : undefined}
-                    aria-haspopup={items.length > 0 ? 'menu' : undefined}
                     aria-expanded={items.length > 0 ? open : undefined}
                     className={cn(
                       'inline-flex items-center gap-1 rounded-full px-3.5 py-2 text-[13.5px] font-semibold transition-colors',
