@@ -1,14 +1,17 @@
+/**
+ * Admin console Tailwind theme (mirrors the client site's ./tailwind.config.js) so the
+ * admin shares the exact same design tokens — ink canvas, beam accent,
+ * glass radii, glows and motion curves.
+ */
+
 /** @type {import('tailwindcss').Config} */
 export default {
   darkMode: ['class'],
-  content: [
-    './index.html',
-    './src/*.{js,jsx}',
-    './src/{components,context,data,lib,pages,services}/**/*.{js,jsx}',
-  ],
+  content: ['./admin/index.html', './src/admin/**/*.{js,jsx}'],
   theme: {
     container: { center: true, padding: '1rem', screens: { '2xl': '1200px' } },
     extend: {
+      spacing: { 4.5: '1.125rem' },
       colors: {
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
@@ -38,7 +41,7 @@ export default {
       boxShadow: {
         glow: '0 0 24px rgba(255, 77, 94, 0.32)',
         'glow-lg': '0 0 60px rgba(255, 77, 94, 0.40)',
-        card: '0 18px 50px -20px rgba(0, 0, 0, 0.6)',
+        card: 'var(--shadow-card)',
       },
       backgroundImage: {
         'accent-grad': 'linear-gradient(135deg, #ff4d5e 0%, #ff6675 100%)',
@@ -57,44 +60,16 @@ export default {
           from: { backgroundPosition: '0% 50%' },
           to: { backgroundPosition: '200% 50%' },
         },
-        'pulse-ring': {
-          '0%': { opacity: '.55', transform: 'scale(.9)' },
-          '70%, 100%': { opacity: '0', transform: 'scale(1.7)' },
-        },
-        'accordion-down': {
-          from: { height: '0' },
-          to: { height: 'var(--radix-accordion-content-height)' },
-        },
-        'accordion-up': {
-          from: { height: 'var(--radix-accordion-content-height)' },
-          to: { height: '0' },
-        },
-        'spin-slow': {
-          to: { transform: 'rotate(360deg)' },
-        },
-        'grid-pan': {
-          to: { backgroundPosition: '54px 54px' },
-        },
         'dropdown-in': {
           from: { opacity: '0', transform: 'translateY(-8px) scale(.985)' },
           to: { opacity: '1', transform: 'translateY(0) scale(1)' },
-        },
-        caret: {
-          '0%, 49%': { opacity: '1' },
-          '50%, 100%': { opacity: '0' },
         },
       },
       animation: {
         'fade-up': 'fade-up 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both',
         float: 'float 6s ease-in-out infinite',
         shimmer: 'shimmer 5s linear infinite',
-        'pulse-ring': 'pulse-ring 2.6s cubic-bezier(0.2,0.7,0.2,1) infinite',
-        'accordion-down': 'accordion-down 0.3s cubic-bezier(0.2,0.7,0.2,1)',
-        'accordion-up': 'accordion-up 0.3s cubic-bezier(0.2,0.7,0.2,1)',
-        'spin-slow': 'spin-slow 22s linear infinite',
-        'grid-pan': 'grid-pan 8s linear infinite',
         'dropdown-in': 'dropdown-in 0.26s cubic-bezier(0.2, 0.7, 0.2, 1) both',
-        caret: 'caret 1s steps(1) infinite',
       },
     },
   },
